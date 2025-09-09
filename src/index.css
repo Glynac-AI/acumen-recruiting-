@@ -284,3 +284,15 @@
     }
   }
 }
+
+.glass-card {
+  @apply bg-white/80 backdrop-blur-sm border border-white/20 shadow-sm;
+}
+
+.button-primary {
+  @apply px-6 py-3 rounded-md bg-ph text-white font-medium transition-colors hover:bg-ph-dark;
+}
+
+.button-secondary {
+  @apply px-6 py-3 rounded-md bg-gray-100 text-foreground font-medium transition-colors hover:bg-gray-200;
+}
