@@ -1,0 +1,286 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-background: 210 50% 98%;
+    --color-foreground: 222.2 84% 4.9%;
+    --color-card: 0 0% 100%;
+    --color-card-foreground: 222.2 84% 4.9%;
+    --color-popover: 0 0% 100%;
+    --color-popover-foreground: 222.2 84% 4.9%;
+    --color-primary: 199 95% 45%;
+    --color-primary-foreground: 210 40% 98%;
+    --color-secondary: 210 40% 96.1%;
+    --color-secondary-foreground: 222.2 47.4% 11.2%;
+    --color-muted: 210 40% 96.1%;
+    --color-muted-foreground: 215.4 16.3% 46.9%;
+    --color-accent: 210 40% 96.1%;
+    --color-accent-foreground: 222.2 47.4% 11.2%;
+    --color-destructive: 0 84.2% 60.2%;
+    --color-destructive-foreground: 210 40% 98%;
+    --color-border: 214.3 31.8% 91.4%;
+    --color-input: 214.3 31.8% 91.4%;
+    --color-ring: 199 95% 45%;
+    --radius: 0.5rem;
+    
+    /* Define ph color specifically */
+    --color-ph: 227 100% 65%;
+    --color-ph-dark: 229 77% 57%;
+    --color-ph-light: 227 100% 74%;
+  }
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--color-border));
+  }
+
+  body {
+    background-color: hsl(var(--color-background));
+    color: hsl(var(--color-foreground));
+  }
+  
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--color-muted));
+    border-radius: 9999px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--color-muted-foreground) / 0.3);
+  }
+  
+  /* Page transition animations */
+  .page-transition-enter {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  
+  .page-transition-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 300ms, transform 300ms;
+  }
+  
+  .page-transition-exit {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .page-transition-exit-active {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 300ms, transform 300ms;
+  }
+}
+
+@layer components {
+  .glass-card {
+    background-color: rgb(255 255 255 / 0.8);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgb(255 255 255 / 0.2);
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  }
+  
+  .service-card {
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    background-color: rgb(255 255 255 / 0.8);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgb(255 255 255 / 0.2);
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+  }
+  
+  .service-card:hover {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  }
+  
+  .navbar-link {
+    position: relative;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    color: rgb(10 37 64 / 0.8);
+    transition-property: color;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 200ms;
+  }
+  
+  .navbar-link:hover {
+    color: rgb(10 37 64);
+  }
+  
+  .navbar-link::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: #4F6BFF;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition-property: transform;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 200ms;
+  }
+  
+  .navbar-link:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  
+  .active-link {
+    color: rgb(10 37 64);
+  }
+  
+  .active-link::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  
+  .button-primary {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-radius: 0.375rem;
+    background-color: #4F6BFF;
+    color: white;
+    font-weight: 500;
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+  }
+  
+  .button-primary:hover {
+    background-color: #3A56E8;
+  }
+  
+  .button-primary:focus {
+    outline: none;
+    ring: 2px;
+    ring-color: rgb(79 107 255 / 0.3);
+  }
+  
+  .button-secondary {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-radius: 0.375rem;
+    background-color: hsl(210 40% 96.1%);
+    color: rgb(10 37 64);
+    font-weight: 500;
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+  }
+  
+  .button-secondary:hover {
+    background-color: hsl(210 40% 90%);
+  }
+  
+  .button-secondary:focus {
+    outline: none;
+    ring: 2px;
+    ring-color: rgb(226 232 240 / 0.5);
+  }
+  
+  .heading-1 {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+    font-weight: 700;
+    font-family: "Inter", sans-serif;
+    letter-spacing: -0.025em;
+  }
+  
+  @media (min-width: 768px) {
+    .heading-1 {
+      font-size: 3rem;
+      line-height: 1;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .heading-1 {
+      font-size: 3.75rem;
+      line-height: 1;
+    }
+  }
+  
+  .heading-2 {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+    font-weight: 700;
+    font-family: "Inter", sans-serif;
+  }
+  
+  @media (min-width: 768px) {
+    .heading-2 {
+      font-size: 2.25rem;
+      line-height: 2.5rem;
+    }
+  }
+  
+  .heading-3 {
+    font-size: 1.5rem;
+    line-height: 2rem;
+    font-weight: 600;
+    font-family: "Inter", sans-serif;
+  }
+  
+  .section-padding {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+  
+  @media (min-width: 768px) {
+    .section-padding {
+      padding-top: 4rem;
+      padding-bottom: 4rem;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .section-padding {
+      padding-top: 5rem;
+      padding-bottom: 5rem;
+    }
+  }
+  
+  .container-padding {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+  
+  @media (min-width: 768px) {
+    .container-padding {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .container-padding {
+      padding-left: 3rem;
+      padding-right: 3rem;
+    }
+  }
+}
