@@ -2,9 +2,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LenisProvider from "@/components/LenisProvider";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-
-// Import page components
 import Home from "@/pages/Home";
+import Contact from "@/pages/Contact";
+import FAQPage from "@/pages/FAQ";
 
 const App = () => (
   <BrowserRouter>
@@ -14,6 +14,8 @@ const App = () => (
         <main className="flex-grow">
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/faq" element={<FAQPage />} />
           </Routes>
         </main>
         <Footer />

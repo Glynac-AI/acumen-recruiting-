@@ -76,15 +76,21 @@ const Navbar = () => {
     setServiceDropdownOpen(false);
   };
 
-  const isActive = (path) => {
+  const isActive = (path: string) => {
     return location.pathname === path;
   };
+
+  // Highlight Services when route is /services or any /counseling/*
+  const servicesActive =
+    location.pathname.includes("/services") ||
+    location.pathname.startsWith("/counseling");
 
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'py-4 bg-white/90 backdrop-blur-md shadow-sm' : 'py-6 bg-transparent'
-          }`}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          isScrolled ? "py-4 bg-white/90 backdrop-blur-md shadow-sm" : "py-6 bg-transparent"
+        }`}
       >
         <div className="container mx-auto px-6 flex justify-between items-center">
           {/* Logo */}
@@ -94,8 +100,9 @@ const Navbar = () => {
             onClick={closeMenus}
           >
             <motion.span
-              className={`text-2xl font-display font-light tracking-tight transition-colors duration-300 ${isScrolled ? 'text-[#0A2540]' : 'text-[#0A2540]'
-                }`}
+              className={`text-2xl font-display font-light tracking-tight transition-colors duration-300 ${
+                isScrolled ? "text-[#0A2540]" : "text-[#0A2540]"
+              }`}
               whileHover={{ x: -3 }}
               transition={{ duration: 0.2 }}
             >
@@ -111,10 +118,11 @@ const Navbar = () => {
 
             <div className="relative group">
               <button
-                className={`px-5 py-2 transition-colors duration-300 rounded-full group flex items-center ${location.pathname.includes("/services")
-                    ? `${isScrolled ? 'text-[#4F6BFF]' : 'text-[#4F6BFF]'}`
-                    : `${isScrolled ? 'text-[#0A2540]' : 'text-[#0A2540]'} hover:text-[#4F6BFF]`
-                  }`}
+                className={`px-5 py-2 transition-colors duration-300 rounded-full group flex items-center ${
+                  servicesActive
+                    ? `${isScrolled ? "text-[#4F6BFF]" : "text-[#4F6BFF]"}`
+                    : `${isScrolled ? "text-[#0A2540]" : "text-[#0A2540]"} hover:text-[#4F6BFF]`
+                }`}
                 onClick={toggleServiceDropdown}
                 onMouseEnter={() => setServiceDropdownOpen(true)}
                 onMouseLeave={() => setServiceDropdownOpen(false)}
@@ -129,7 +137,7 @@ const Navbar = () => {
                   <motion.div
                     className="absolute top-full left-0 mt-2 w-[600px] rounded-xl overflow-hidden shadow-xl bg-white border border-gray-100"
                     initial={{ opacity: 0, y: -5, height: 0 }}
-                    animate={{ opacity: 1, y: 0, height: 'auto' }}
+                    animate={{ opacity: 1, y: 0, height: "auto" }}
                     exit={{ opacity: 0, y: -5, height: 0 }}
                     transition={{ duration: 0.2 }}
                     onMouseEnter={() => setServiceDropdownOpen(true)}
@@ -140,7 +148,9 @@ const Navbar = () => {
                       <div className="space-y-6">
                         {serviceItems.slice(0, 2).map((category, idx) => (
                           <div key={idx}>
-                            <h3 className="text-xs font-medium text-[#6B7280] uppercase tracking-wider mb-3">{category.category}</h3>
+                            <h3 className="text-xs font-medium text-[#6B7280] uppercase tracking-wider mb-3">
+                              {category.category}
+                            </h3>
                             <ul className="space-y-2">
                               {category.items.map((item, index) => (
                                 <li key={index}>
@@ -167,7 +177,9 @@ const Navbar = () => {
                       <div className="space-y-6">
                         {serviceItems.slice(2).map((category, idx) => (
                           <div key={idx}>
-                            <h3 className="text-xs font-medium text-[#6B7280] uppercase tracking-wider mb-3">{category.category}</h3>
+                            <h3 className="text-xs font-medium text-[#6B7280] uppercase tracking-wider mb-3">
+                              {category.category}
+                            </h3>
                             <ul className="space-y-2">
                               {category.items.map((item, index) => (
                                 <li key={index}>
@@ -211,14 +223,16 @@ const Navbar = () => {
               About
             </NavLink>
 
+            {/* NEW: FAQ link */}
+            <NavLink href="/faq" active={isActive("/faq")} isScrolled={isScrolled}>
+              FAQ
+            </NavLink>
+
             <NavLink href="/contact" active={isActive("/contact")} isScrolled={isScrolled}>
               Contact
             </NavLink>
 
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Link
                 to="/contact"
                 className="ml-3 inline-flex items-center justify-center px-6 py-2 bg-[#4F6BFF] text-white text-sm font-medium rounded-full shadow-sm hover:shadow-md transition-all"
@@ -243,7 +257,7 @@ const Navbar = () => {
                   exit={{ opacity: 0, rotate: 90 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <X className={`w-6 h-6 ${isScrolled ? 'text-[#0A2540]' : 'text-[#0A2540]'}`} />
+                  <X className={`w-6 h-6 ${isScrolled ? "text-[#0A2540]" : "text-[#0A2540]"}`} />
                 </motion.div>
               ) : (
                 <motion.div
@@ -253,7 +267,7 @@ const Navbar = () => {
                   exit={{ opacity: 0, rotate: -90 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <Menu className={`w-6 h-6 ${isScrolled ? 'text-[#0A2540]' : 'text-[#0A2540]'}`} />
+                  <Menu className={`w-6 h-6 ${isScrolled ? "text-[#0A2540]" : "text-[#0A2540]"}`} />
                 </motion.div>
               )}
             </AnimatePresence>
@@ -285,8 +299,11 @@ const Navbar = () => {
                 onClick={toggleServiceDropdown}
               >
                 <span>Services</span>
-                <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${serviceDropdownOpen ? 'rotate-180' : ''
-                  }`} />
+                <ChevronDown
+                  className={`w-5 h-5 transition-transform duration-300 ${
+                    serviceDropdownOpen ? "rotate-180" : ""
+                  }`}
+                />
               </button>
 
               {/* Mobile Services Dropdown */}
@@ -301,7 +318,9 @@ const Navbar = () => {
                   >
                     {serviceItems.map((category, idx) => (
                       <div key={idx} className="mb-4">
-                        <h3 className="text-xs font-medium text-[#6B7280] uppercase tracking-wider mb-3">{category.category}</h3>
+                        <h3 className="text-xs font-medium text-[#6B7280] uppercase tracking-wider mb-3">
+                          {category.category}
+                        </h3>
                         <ul className="space-y-3">
                           {category.items.map((item, index) => (
                             <li key={index}>
@@ -330,6 +349,15 @@ const Navbar = () => {
                 About
               </Link>
 
+              {/* NEW: FAQ link (mobile) */}
+              <Link
+                to="/faq"
+                className="flex items-center py-4 text-xl font-medium text-[#0A2540]"
+                onClick={closeMenus}
+              >
+                FAQ
+              </Link>
+
               <Link
                 to="/contact"
                 className="flex items-center py-4 text-xl font-medium text-[#0A2540]"
@@ -356,14 +384,25 @@ const Navbar = () => {
 };
 
 // NavLink component for consistent styling
-const NavLink = ({ href, active, isScrolled, children }) => {
+const NavLink = ({
+  href,
+  active,
+  isScrolled,
+  children,
+}: {
+  href: string;
+  active: boolean;
+  isScrolled: boolean;
+  children: React.ReactNode;
+}) => {
   return (
     <Link
       to={href}
-      className={`px-5 py-2 transition-colors duration-300 rounded-full ${active
-          ? `${isScrolled ? 'text-[#4F6BFF]' : 'text-[#4F6BFF]'}`
-          : `${isScrolled ? 'text-[#0A2540]' : 'text-[#0A2540]'} hover:text-[#4F6BFF]`
-        }`}
+      className={`px-5 py-2 transition-colors duration-300 rounded-full ${
+        active
+          ? `${isScrolled ? "text-[#4F6BFF]" : "text-[#4F6BFF]"}`
+          : `${isScrolled ? "text-[#0A2540]" : "text-[#0A2540]"} hover:text-[#4F6BFF]`
+      }`}
     >
       {children}
     </Link>
