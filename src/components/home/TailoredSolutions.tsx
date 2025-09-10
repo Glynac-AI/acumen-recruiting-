@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
-import { Play, Users, Layers, ArrowRight, Check } from "lucide-react";
+import { Play, Users, Layers, Handshake, ArrowRight, Check } from "lucide-react";
 
 const TailoredSolutions = () => {
     const [activeSolution, setActiveSolution] = useState("snapshot");
@@ -359,6 +359,28 @@ const TailoredSolutions = () => {
                                 />
                             </div>
 
+                            {/* New success fee explanation section */}
+                            <motion.div
+                                className="mt-10 bg-ph/5 rounded-xl p-6 border border-ph/10"
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.6, duration: 0.5 }}
+                            >
+                                <div className="flex items-start gap-4">
+                                    <div className="bg-white rounded-lg p-2 text-ph mt-1">
+                                        <Handshake className="w-5 h-5" />
+                                    </div>
+                                    <div>
+                                        <h4 className="text-lg font-medium text-foreground mb-2">Success Fee Alignment</h4>
+                                        <p className="text-muted-foreground">
+                                            Our success fees ensure our incentives are directly aligned with your successful placements while reflecting the greater
+                                            selectivity and effort required for higher-compensation candidates. You only pay this fee when you've found your ideal match.
+                                        </p>
+                                    </div>
+                                </div>
+                            </motion.div>
+
                             <div className="text-center mt-10">
                                 <motion.a
                                     href="/pricing"
@@ -395,8 +417,8 @@ const PricingTier = ({
     return (
         <motion.div
             className={`rounded-lg overflow-hidden ${highlight
-                    ? 'glass-card border border-ph/20 shadow-md shadow-ph/5'
-                    : 'bg-white/80 border border-white/20'
+                ? 'glass-card border border-ph/20 shadow-md shadow-ph/5'
+                : 'bg-white/80 border border-white/20'
                 }`}
             whileHover={{ y: -3 }}
             transition={{ duration: 0.3 }}
@@ -413,9 +435,13 @@ const PricingTier = ({
 
                 <p className="text-xs text-muted-foreground mb-3">Roles paying {range}</p>
 
-                <div className={`text-2xl font-light ${highlight ? 'text-ph' : 'text-foreground'}`}>
-                    {successFee}
-                    <span className="text-xs font-normal text-muted-foreground ml-1">per hire</span>
+                {/* Enhanced success fee display */}
+                <div className={`mb-2 p-2 rounded-lg ${highlight ? 'bg-ph/10' : 'bg-gray-50'}`}>
+                    <p className="text-xs uppercase tracking-wide text-muted-foreground font-medium">Success Fee</p>
+                    <div className={`text-2xl font-light ${highlight ? 'text-ph' : 'text-foreground'}`}>
+                        {successFee}
+                        <span className="text-xs font-normal text-muted-foreground ml-1">per hire</span>
+                    </div>
                 </div>
 
                 <div className="mt-3 text-xs text-muted-foreground">{description}</div>

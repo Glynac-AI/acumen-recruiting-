@@ -4,42 +4,6 @@ import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronDown, ChevronRight } from "lucide-react";
 
-// Service dropdown items organized by categories
-const serviceItems = [
-  {
-    category: "Business Growth",
-    items: [
-      { name: "Practice Management", path: "/counseling/practice-management" },
-      { name: "Lead Generation", path: "/counseling/lead-generation" },
-      { name: "Sales Coaching", path: "/counseling/sales-coaching" },
-    ]
-  },
-  {
-    category: "Team Development",
-    items: [
-      { name: "Recruiting", path: "/counseling/recruiting" },
-      { name: "Succession Planning", path: "/counseling/succession-planning" },
-      { name: "Well-being", path: "/counseling/well-being" },
-    ]
-  },
-  {
-    category: "Client Services",
-    items: [
-      { name: "Client Retention", path: "/counseling/client-retention" },
-      { name: "Holistic Planning", path: "/counseling/holistic-planning" },
-      { name: "Estate Planning", path: "/counseling/estate-planning" },
-      { name: "Tax Planning", path: "/counseling/tax-planning" },
-    ]
-  },
-  {
-    category: "Operations",
-    items: [
-      { name: "Task Automation", path: "/counseling/task-automation" },
-      { name: "Portfolio Evaluation", path: "/counseling/portfolio-evaluation" },
-    ]
-  }
-];
-
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -80,6 +44,28 @@ const Navbar = () => {
     return location.pathname === path;
   };
 
+  // Simplified service items for the dropdown
+  const serviceItems = [
+    {
+      category: "Our Services",
+      items: [
+        { name: "Talent Snapshot™", path: "/services#snapshot" },
+        { name: "Talent DeepDive™", path: "/services#deepdive" },
+        { name: "Complete Talent Pack™", path: "/services#complete" },
+      ]
+    },
+    {
+      category: "Roles We Fill",
+      items: [
+        { name: "Wealth Managers", path: "/services#wealth-managers" },
+        { name: "Financial Planners", path: "/services#financial-planners" },
+        { name: "Tax Advisors", path: "/services#tax-advisors" },
+        { name: "Estate Planning", path: "/services#estate-planning" },
+        { name: "Compliance Officers", path: "/services#compliance" },
+      ]
+    }
+  ];
+
   return (
     <>
       <header
@@ -112,8 +98,8 @@ const Navbar = () => {
             <div className="relative group">
               <button
                 className={`px-5 py-2 transition-colors duration-300 rounded-full group flex items-center ${location.pathname.includes("/services")
-                    ? `${isScrolled ? 'text-[#4F6BFF]' : 'text-[#4F6BFF]'}`
-                    : `${isScrolled ? 'text-[#0A2540]' : 'text-[#0A2540]'} hover:text-[#4F6BFF]`
+                  ? `${isScrolled ? 'text-[#4F6BFF]' : 'text-[#4F6BFF]'}`
+                  : `${isScrolled ? 'text-[#0A2540]' : 'text-[#0A2540]'} hover:text-[#4F6BFF]`
                   }`}
                 onClick={toggleServiceDropdown}
                 onMouseEnter={() => setServiceDropdownOpen(true)}
@@ -127,7 +113,7 @@ const Navbar = () => {
               <AnimatePresence>
                 {serviceDropdownOpen && (
                   <motion.div
-                    className="absolute top-full left-0 mt-2 w-[600px] rounded-xl overflow-hidden shadow-xl bg-white border border-gray-100"
+                    className="absolute top-full left-0 mt-2 w-[500px] rounded-xl overflow-hidden shadow-xl bg-white border border-gray-100"
                     initial={{ opacity: 0, y: -5, height: 0 }}
                     animate={{ opacity: 1, y: 0, height: 'auto' }}
                     exit={{ opacity: 0, y: -5, height: 0 }}
@@ -136,59 +122,29 @@ const Navbar = () => {
                     onMouseLeave={() => setServiceDropdownOpen(false)}
                   >
                     <div className="p-6 grid grid-cols-2 gap-8">
-                      {/* Left Column */}
-                      <div className="space-y-6">
-                        {serviceItems.slice(0, 2).map((category, idx) => (
-                          <div key={idx}>
-                            <h3 className="text-xs font-medium text-[#6B7280] uppercase tracking-wider mb-3">{category.category}</h3>
-                            <ul className="space-y-2">
-                              {category.items.map((item, index) => (
-                                <li key={index}>
-                                  <Link
-                                    to={item.path}
-                                    className="group flex items-center text-[#0A2540] hover:text-[#4F6BFF] transition-colors py-1"
-                                    onClick={closeMenus}
-                                  >
-                                    <span className="opacity-0 group-hover:opacity-100 transform translate-x-0 group-hover:-translate-x-2 transition-all">
-                                      <ChevronRight className="w-3 h-3" />
-                                    </span>
-                                    <span className="transform translate-x-0 group-hover:-translate-x-1 transition-transform">
-                                      {item.name}
-                                    </span>
-                                  </Link>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Right Column */}
-                      <div className="space-y-6">
-                        {serviceItems.slice(2).map((category, idx) => (
-                          <div key={idx}>
-                            <h3 className="text-xs font-medium text-[#6B7280] uppercase tracking-wider mb-3">{category.category}</h3>
-                            <ul className="space-y-2">
-                              {category.items.map((item, index) => (
-                                <li key={index}>
-                                  <Link
-                                    to={item.path}
-                                    className="group flex items-center text-[#0A2540] hover:text-[#4F6BFF] transition-colors py-1"
-                                    onClick={closeMenus}
-                                  >
-                                    <span className="opacity-0 group-hover:opacity-100 transform translate-x-0 group-hover:-translate-x-2 transition-all">
-                                      <ChevronRight className="w-3 h-3" />
-                                    </span>
-                                    <span className="transform translate-x-0 group-hover:-translate-x-1 transition-transform">
-                                      {item.name}
-                                    </span>
-                                  </Link>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        ))}
-                      </div>
+                      {serviceItems.map((category, idx) => (
+                        <div key={idx}>
+                          <h3 className="text-xs font-medium text-[#6B7280] uppercase tracking-wider mb-3">{category.category}</h3>
+                          <ul className="space-y-2">
+                            {category.items.map((item, index) => (
+                              <li key={index}>
+                                <Link
+                                  to={item.path}
+                                  className="group flex items-center text-[#0A2540] hover:text-[#4F6BFF] transition-colors py-1"
+                                  onClick={closeMenus}
+                                >
+                                  <span className="opacity-0 group-hover:opacity-100 transform translate-x-0 group-hover:-translate-x-2 transition-all">
+                                    <ChevronRight className="w-3 h-3" />
+                                  </span>
+                                  <span className="transform translate-x-0 group-hover:-translate-x-1 transition-transform">
+                                    {item.name}
+                                  </span>
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
                     </div>
 
                     {/* Footer with CTA */}
@@ -209,6 +165,10 @@ const Navbar = () => {
 
             <NavLink href="/about" active={isActive("/about")} isScrolled={isScrolled}>
               About
+            </NavLink>
+
+            <NavLink href="/pricing" active={isActive("/pricing")} isScrolled={isScrolled}>
+              Pricing
             </NavLink>
 
             <NavLink href="/contact" active={isActive("/contact")} isScrolled={isScrolled}>
@@ -331,6 +291,14 @@ const Navbar = () => {
               </Link>
 
               <Link
+                to="/pricing"
+                className="flex items-center py-4 text-xl font-medium text-[#0A2540]"
+                onClick={closeMenus}
+              >
+                Pricing
+              </Link>
+
+              <Link
                 to="/contact"
                 className="flex items-center py-4 text-xl font-medium text-[#0A2540]"
                 onClick={closeMenus}
@@ -361,8 +329,8 @@ const NavLink = ({ href, active, isScrolled, children }) => {
     <Link
       to={href}
       className={`px-5 py-2 transition-colors duration-300 rounded-full ${active
-          ? `${isScrolled ? 'text-[#4F6BFF]' : 'text-[#4F6BFF]'}`
-          : `${isScrolled ? 'text-[#0A2540]' : 'text-[#0A2540]'} hover:text-[#4F6BFF]`
+        ? `${isScrolled ? 'text-[#4F6BFF]' : 'text-[#4F6BFF]'}`
+        : `${isScrolled ? 'text-[#0A2540]' : 'text-[#0A2540]'} hover:text-[#4F6BFF]`
         }`}
     >
       {children}

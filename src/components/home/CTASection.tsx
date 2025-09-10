@@ -1,30 +1,51 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { PhoneCall, ArrowRight, CheckCircle } from "lucide-react";
+import { PhoneCall, ArrowRight, CheckCircle, Shield, Database, Sliders, Users, RefreshCw } from "lucide-react";
 
 const CTASection = () => {
-  // Benefits list
-  const benefits = [
-    "Access to pre-screened wealth management talent",
-    "Technology-enhanced candidate discovery",
-    "Industry-specific expertise",
-    "Accelerated hiring process"
+  // Benefits list - Updated with the 5 key value propositions from the document
+  const valuePropositions = [
+    {
+      title: "Proven Industry Partner",
+      description: "A proven partner with deep wealth management industry experience",
+      icon: <Shield className="w-5 h-5" />
+    },
+    {
+      title: "Extensive Candidate Database",
+      description: "Access to 2,000+ pre-screened candidates, plus fresh recruiting for every client",
+      icon: <Database className="w-5 h-5" />
+    },
+    {
+      title: "Streamlined Technology",
+      description: "Efficient online system delivering videos, resumes, and interviews directly to you",
+      icon: <Sliders className="w-5 h-5" />
+    },
+    {
+      title: "Continuous Refinement",
+      description: "Feedback loops and dedicated support to optimize your candidate pool",
+      icon: <RefreshCw className="w-5 h-5" />
+    },
+    {
+      title: "Transparent Pricing",
+      description: "Tiered, transparent pricing model aligned with candidate seniority and selectivity",
+      icon: <Users className="w-5 h-5" />
+    }
   ];
 
   return (
     <section className="py-28 relative overflow-hidden">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-r from-ph/90 to-ph pointer-events-none"></div>
-      
+      {/* Rich gradient background with deeper colors */}
+      <div className="absolute inset-0 bg-gradient-to-r from-ph/95 to-[#3A56E8] pointer-events-none"></div>
+
       {/* Abstract background elements */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute right-0 top-0 w-1/3 h-1/3 bg-white/5 rounded-bl-[100px]"></div>
         <div className="absolute left-0 bottom-0 w-1/2 h-1/2 bg-white/5 rounded-tr-[200px]"></div>
 
-        {/* Abstract circles */}
-        <div className="absolute top-[20%] left-[10%] w-32 h-32 rounded-full border border-white/10"></div>
-        <div className="absolute bottom-[30%] right-[15%] w-24 h-24 rounded-full border border-white/10"></div>
-        <div className="absolute top-[60%] left-[30%] w-16 h-16 rounded-full border border-white/10"></div>
+        {/* Abstract circles with more pronounced borders */}
+        <div className="absolute top-[20%] left-[10%] w-32 h-32 rounded-full border border-white/15"></div>
+        <div className="absolute bottom-[30%] right-[15%] w-24 h-24 rounded-full border border-white/15"></div>
+        <div className="absolute top-[60%] left-[30%] w-16 h-16 rounded-full border border-white/15"></div>
       </div>
 
       <div className="container mx-auto px-6 relative z-10">
@@ -44,6 +65,47 @@ const CTASection = () => {
             </p>
           </motion.div>
 
+          {/* Value Propositions Section - Redesigned with deeper colors */}
+          <motion.div
+            className="mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ delay: 0.1, duration: 0.6 }}
+          >
+            <h3 className="text-2xl font-light text-white text-center mb-8">
+              With Acumen Recruiting, You Get
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {valuePropositions.map((prop, index) => (
+                <motion.div
+                  key={index}
+                  className="bg-white/10 backdrop-blur-sm rounded-lg p-5 border border-white/15 shadow-lg shadow-black/10"
+                  initial={{ opacity: 0, y: 15 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.2 + index * 0.1, duration: 0.5 }}
+                  whileHover={{
+                    y: -5,
+                    backgroundColor: "rgba(255, 255, 255, 0.15)",
+                    boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.15)"
+                  }}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="bg-white/15 p-2.5 rounded-lg text-white">
+                      {prop.icon}
+                    </div>
+                    <div>
+                      <h4 className="text-white font-medium mb-1">{prop.title}</h4>
+                      <p className="text-white/90 text-sm">{prop.description}</p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
           <motion.div
             className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
             initial={{ opacity: 0, y: 20 }}
@@ -52,7 +114,7 @@ const CTASection = () => {
             transition={{ delay: 0.2, duration: 0.6 }}
           >
             <div>
-              <div className="bg-white/10 rounded-xl p-8 backdrop-blur-sm border border-white/10">
+              <div className="bg-white/15 rounded-xl p-8 backdrop-blur-sm border border-white/15 shadow-xl shadow-black/10">
                 <h3 className="text-2xl font-light text-white mb-6">Schedule Your Consultation</h3>
 
                 <form className="space-y-5">
@@ -63,7 +125,7 @@ const CTASection = () => {
                     <input
                       type="text"
                       id="name"
-                      className="w-full px-4 py-3 rounded-md border-0 bg-white/10 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30 transition-all"
+                      className="w-full px-4 py-3 rounded-md border-0 bg-white/15 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/40 transition-all"
                       placeholder="John Smith"
                     />
                   </div>
@@ -75,7 +137,7 @@ const CTASection = () => {
                     <input
                       type="email"
                       id="email"
-                      className="w-full px-4 py-3 rounded-md border-0 bg-white/10 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30 transition-all"
+                      className="w-full px-4 py-3 rounded-md border-0 bg-white/15 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/40 transition-all"
                       placeholder="john@example.com"
                     />
                   </div>
@@ -87,7 +149,7 @@ const CTASection = () => {
                     <input
                       type="text"
                       id="company"
-                      className="w-full px-4 py-3 rounded-md border-0 bg-white/10 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30 transition-all"
+                      className="w-full px-4 py-3 rounded-md border-0 bg-white/15 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/40 transition-all"
                       placeholder="Your Wealth Management Firm"
                     />
                   </div>
@@ -98,7 +160,7 @@ const CTASection = () => {
                     </label>
                     <select
                       id="role"
-                      className="w-full px-4 py-3 rounded-md border-0 bg-white/10 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30 transition-all"
+                      className="w-full px-4 py-3 rounded-md border-0 bg-white/15 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/40 transition-all"
                     >
                       <option value="" disabled selected className="text-gray-500">Select role type</option>
                       <option value="wealth-manager">Wealth Manager / Advisor</option>
@@ -113,8 +175,8 @@ const CTASection = () => {
 
                   <motion.button
                     type="submit"
-                    className="w-full py-4 bg-white text-ph font-medium rounded-md hover:bg-opacity-90 transition-colors flex items-center justify-center gap-2"
-                    whileHover={{ scale: 1.02 }}
+                    className="w-full py-4 bg-white text-ph font-medium rounded-md hover:bg-opacity-90 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-black/10"
+                    whileHover={{ scale: 1.02, boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.15)" }}
                     whileTap={{ scale: 0.98 }}
                   >
                     Schedule Your Consultation
@@ -128,7 +190,12 @@ const CTASection = () => {
               <h3 className="text-2xl font-light text-white mb-8">Why Partner with Acumen</h3>
 
               <ul className="space-y-6 mb-10">
-                {benefits.map((benefit, index) => (
+                {[
+                  "Access to pre-screened wealth management talent",
+                  "Technology-enhanced candidate discovery",
+                  "Industry-specific expertise",
+                  "Accelerated hiring process"
+                ].map((benefit, index) => (
                   <motion.li
                     key={index}
                     className="flex items-start gap-4"
@@ -143,7 +210,7 @@ const CTASection = () => {
                 ))}
               </ul>
 
-              <div className="p-6 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10">
+              <div className="p-6 rounded-xl bg-white/15 backdrop-blur-sm border border-white/15 shadow-lg shadow-black/10">
                 <blockquote className="text-white/90 italic">
                   "Acumen helped us find our Senior Wealth Advisor in just 12 days - a position we had been struggling to fill for months."
                 </blockquote>
