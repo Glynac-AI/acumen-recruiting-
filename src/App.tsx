@@ -5,6 +5,7 @@ import Footer from "@/components/layout/Footer";
 
 // Import page components
 import Home from "@/pages/Home";
+import Services from "./pages/Services";
 
 const App = () => (
   <BrowserRouter>
@@ -14,6 +15,7 @@ const App = () => (
         <main className="flex-grow">
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/services" element={<Services />} />
           </Routes>
         </main>
         <Footer />
