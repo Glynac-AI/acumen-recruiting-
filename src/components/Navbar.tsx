@@ -12,7 +12,7 @@ const serviceItems = [
       { name: "Practice Management", path: "/counseling/practice-management" },
       { name: "Lead Generation", path: "/counseling/lead-generation" },
       { name: "Sales Coaching", path: "/counseling/sales-coaching" },
-    ]
+    ],
   },
   {
     category: "Team Development",
@@ -20,7 +20,7 @@ const serviceItems = [
       { name: "Recruiting", path: "/counseling/recruiting" },
       { name: "Succession Planning", path: "/counseling/succession-planning" },
       { name: "Well-being", path: "/counseling/well-being" },
-    ]
+    ],
   },
   {
     category: "Client Services",
@@ -29,15 +29,15 @@ const serviceItems = [
       { name: "Holistic Planning", path: "/counseling/holistic-planning" },
       { name: "Estate Planning", path: "/counseling/estate-planning" },
       { name: "Tax Planning", path: "/counseling/tax-planning" },
-    ]
+    ],
   },
   {
     category: "Operations",
     items: [
       { name: "Task Automation", path: "/counseling/task-automation" },
       { name: "Portfolio Evaluation", path: "/counseling/portfolio-evaluation" },
-    ]
-  }
+    ],
+  },
 ];
 
 const Navbar = () => {
@@ -48,18 +48,9 @@ const Navbar = () => {
 
   // Track scroll position
   useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
-    };
-
+    const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const toggleMenu = () => {
@@ -67,18 +58,13 @@ const Navbar = () => {
     if (serviceDropdownOpen) setServiceDropdownOpen(false);
   };
 
-  const toggleServiceDropdown = () => {
-    setServiceDropdownOpen(!serviceDropdownOpen);
-  };
-
+  const toggleServiceDropdown = () => setServiceDropdownOpen(!serviceDropdownOpen);
   const closeMenus = () => {
     setIsOpen(false);
     setServiceDropdownOpen(false);
   };
 
-  const isActive = (path: string) => {
-    return location.pathname === path;
-  };
+  const isActive = (path: string) => location.pathname === path;
 
   // Highlight Services when route is /services or any /counseling/*
   const servicesActive =
@@ -94,11 +80,7 @@ const Navbar = () => {
       >
         <div className="container mx-auto px-6 flex justify-between items-center">
           {/* Logo */}
-          <Link
-            to="/"
-            className="relative z-10 flex items-center"
-            onClick={closeMenus}
-          >
+          <Link to="/" className="relative z-10 flex items-center" onClick={closeMenus}>
             <motion.span
               className={`text-2xl font-display font-light tracking-tight transition-colors duration-300 ${
                 isScrolled ? "text-[#0A2540]" : "text-[#0A2540]"
@@ -106,7 +88,7 @@ const Navbar = () => {
               whileHover={{ x: -3 }}
               transition={{ duration: 0.2 }}
             >
-              <span className={`font-normal text-[#4F6BFF]`}>Acumen</span> Recruiting
+              <span className="font-normal text-[#4F6BFF]">Acumen</span> Recruiting
             </motion.span>
           </Link>
 
@@ -223,10 +205,7 @@ const Navbar = () => {
               About
             </NavLink>
 
-            {/* NEW: FAQ link */}
-            <NavLink href="/faq" active={isActive("/faq")} isScrolled={isScrolled}>
-              FAQ
-            </NavLink>
+            {/* FAQ removed */}
 
             <NavLink href="/contact" active={isActive("/contact")} isScrolled={isScrolled}>
               Contact
@@ -243,11 +222,7 @@ const Navbar = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <button
-            className="lg:hidden relative z-10"
-            onClick={toggleMenu}
-            aria-label="Toggle menu"
-          >
+          <button className="lg:hidden relative z-10" onClick={toggleMenu} aria-label="Toggle menu">
             <AnimatePresence mode="wait">
               {isOpen ? (
                 <motion.div
@@ -349,14 +324,7 @@ const Navbar = () => {
                 About
               </Link>
 
-              {/* NEW: FAQ link (mobile) */}
-              <Link
-                to="/faq"
-                className="flex items-center py-4 text-xl font-medium text-[#0A2540]"
-                onClick={closeMenus}
-              >
-                FAQ
-              </Link>
+              {/* FAQ removed */}
 
               <Link
                 to="/contact"
