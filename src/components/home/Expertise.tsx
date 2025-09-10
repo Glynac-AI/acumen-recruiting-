@@ -1,16 +1,17 @@
 import React, { useRef } from "react";
 import { motion, useScroll, useTransform, Variants } from "framer-motion";
+import { Trophy, Award, Clock } from "lucide-react";
 
 const Expertise = () => {
     // Refs for scroll-based animations
     const sectionRef = useRef(null);
-    
+
     // Scroll-based animations
     const { scrollYProgress } = useScroll({
         target: sectionRef,
         offset: ["start end", "end start"]
     });
-    
+
     const backgroundOpacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
     const backgroundScale = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0.95, 1, 1, 0.95]);
 
@@ -38,10 +39,36 @@ const Expertise = () => {
     const titleVariants: Variants = {
         hidden: { opacity: 0, y: 20 },
         visible: {
-            opacity: 1, 
+            opacity: 1,
             y: 0,
-            transition: { 
-                duration: 0.7, 
+            transition: {
+                duration: 0.7,
+                ease: [0.22, 1, 0.36, 1]
+            }
+        }
+    };
+
+    // Smoother animation variants for track record cards
+    const trackRecordContainerVariants: Variants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.08,
+                delayChildren: 0.2,
+                ease: [0.22, 1, 0.36, 1],
+                duration: 0.8
+            }
+        }
+    };
+
+    const trackRecordItemVariants: Variants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: {
+                duration: 0.8,
                 ease: [0.22, 1, 0.36, 1]
             }
         }
@@ -91,36 +118,46 @@ const Expertise = () => {
         }
     ];
 
+    // Track record statistics from the management document
+    const trackRecordStats = [
+        { label: "Wealth Managers", count: "30+", icon: <Trophy className="w-5 h-5" /> },
+        { label: "Financial Planners", count: "20", icon: <Trophy className="w-5 h-5" /> },
+        { label: "Tax Advisors", count: "8", icon: <Trophy className="w-5 h-5" /> },
+        { label: "Estate Planning Specialists", count: "15", icon: <Trophy className="w-5 h-5" /> },
+        { label: "Compliance Officers", count: "5", icon: <Trophy className="w-5 h-5" /> },
+        { label: "Support Staff", count: "100s", icon: <Trophy className="w-5 h-5" /> }
+    ];
+
     return (
-        <section 
+        <section
             ref={sectionRef}
             className="py-32 relative overflow-hidden"
         >
             {/* Enhanced background elements with parallax effects */}
-            <motion.div 
+            <motion.div
                 className="absolute inset-0 bg-gradient-to-b from-white to-ph-light/5 z-0"
-                style={{ 
+                style={{
                     opacity: backgroundOpacity,
                     scale: backgroundScale
                 }}
             />
-            
+
             {/* Animated background decorative elements */}
-            <motion.div 
+            <motion.div
                 className="absolute top-1/4 right-0 w-96 h-96 bg-ph/5 rounded-full blur-3xl -z-10 opacity-50"
                 style={{
                     x: useTransform(scrollYProgress, [0, 1], [100, -100]),
                     scale: useTransform(scrollYProgress, [0, 0.5, 1], [0.8, 1.2, 0.8])
                 }}
             />
-            <motion.div 
+            <motion.div
                 className="absolute bottom-1/4 left-0 w-64 h-64 bg-ph/5 rounded-full blur-3xl -z-10 opacity-50"
                 style={{
                     x: useTransform(scrollYProgress, [0, 1], [-50, 50]),
                     scale: useTransform(scrollYProgress, [0, 0.5, 1], [1, 1.3, 1])
                 }}
             />
-            
+
             {/* Subtle grain texture */}
             <div className="absolute inset-0 opacity-[0.02] pointer-events-none" style={{
                 backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
@@ -134,7 +171,7 @@ const Expertise = () => {
                     whileInView="visible"
                     viewport={{ once: true, margin: "-100px" }}
                 >
-                    <motion.span 
+                    <motion.span
                         className="inline-block py-1 px-3 bg-ph/10 text-ph font-medium rounded-full text-sm mb-6"
                         initial={{ opacity: 0, y: -10 }}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -142,7 +179,7 @@ const Expertise = () => {
                     >
                         Our Expertise
                     </motion.span>
-                    <motion.h2 
+                    <motion.h2
                         className="text-4xl md:text-5xl font-display font-light tracking-wide text-foreground mb-6"
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -150,7 +187,7 @@ const Expertise = () => {
                     >
                         Curated Talent for Wealth Management
                     </motion.h2>
-                    <motion.p 
+                    <motion.p
                         className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed"
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -173,9 +210,9 @@ const Expertise = () => {
                             className="relative"
                             variants={itemVariants}
                         >
-                            <motion.div 
+                            <motion.div
                                 className="glass-card rounded-xl overflow-hidden h-full flex flex-col hover:shadow-lg transition-all duration-500"
-                                whileHover={{ 
+                                whileHover={{
                                     y: -8,
                                     boxShadow: "0 20px 40px rgba(79, 107, 255, 0.1)",
                                     transition: { duration: 0.3 }
@@ -207,7 +244,7 @@ const Expertise = () => {
                                             </motion.li>
                                         ))}
                                     </ul>
-                                    
+
                                     {/* Candidate count indicator */}
                                     <div className="pt-4 border-t border-gray-100">
                                         <div className="flex items-center justify-between">
@@ -215,7 +252,7 @@ const Expertise = () => {
                                             <span className="text-ph font-medium">{category.count}+</span>
                                         </div>
                                         <div className="mt-2 h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
-                                            <motion.div 
+                                            <motion.div
                                                 className="h-full bg-ph rounded-full"
                                                 initial={{ width: 0 }}
                                                 whileInView={{ width: `${Math.min(100, (category.count / 2000) * 100)}%` }}
@@ -224,11 +261,11 @@ const Expertise = () => {
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 {/* Connecting lines between cards (desktop only) */}
                                 {index < expertiseCategories.length - 1 && (
                                     <div className="hidden lg:block absolute -right-6 top-1/2 transform -translate-y-1/2">
-                                        <motion.div 
+                                        <motion.div
                                             className="w-12 h-px bg-ph/20"
                                             initial={{ scaleX: 0 }}
                                             whileInView={{ scaleX: 1 }}
@@ -241,8 +278,82 @@ const Expertise = () => {
                     ))}
                 </motion.div>
 
+                {/* NEW: Track Record Section (MOVED BELOW CARDS) */}
+                <motion.div
+                    className="mt-24 max-w-5xl mx-auto"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-50px" }}
+                    transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                >
+                    <div className="glass-card rounded-xl p-8 border border-ph/10 shadow-sm relative overflow-hidden">
+                        {/* Background gradient */}
+                        <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-gradient-to-br from-ph/5 to-transparent blur-3xl opacity-40"></div>
+
+                        <div className="relative z-10">
+                            <div className="flex items-center gap-3 mb-8">
+                                <Award className="w-6 h-6 text-ph" />
+                                <h3 className="text-2xl font-display font-light text-foreground">Proven Track Record</h3>
+                            </div>
+
+                            <motion.div
+                                className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-5"
+                                variants={trackRecordContainerVariants}
+                                initial="hidden"
+                                whileInView="visible"
+                                viewport={{ once: true, margin: "-50px" }}
+                            >
+                                {trackRecordStats.map((stat, index) => (
+                                    <motion.div
+                                        key={index}
+                                        className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 text-center group"
+                                        variants={trackRecordItemVariants}
+                                        whileHover={{
+                                            y: -5,
+                                            boxShadow: "0 15px 30px -10px rgba(79, 107, 255, 0.15)",
+                                            transition: { duration: 0.3, ease: "easeOut" }
+                                        }}
+                                    >
+                                        <div className="flex justify-center mb-2">
+                                            <motion.div
+                                                className="w-10 h-10 rounded-full bg-ph/10 flex items-center justify-center text-ph"
+                                                whileHover={{
+                                                    scale: 1.05,
+                                                    backgroundColor: "rgba(79, 107, 255, 0.15)",
+                                                    transition: { duration: 0.2 }
+                                                }}
+                                            >
+                                                {stat.icon}
+                                            </motion.div>
+                                        </div>
+                                        <div className="text-2xl font-light text-foreground mb-1 group-hover:text-ph transition-colors duration-300">
+                                            {stat.count}
+                                        </div>
+                                        <div className="text-xs text-muted-foreground">
+                                            {stat.label}
+                                        </div>
+                                    </motion.div>
+                                ))}
+                            </motion.div>
+
+                            <motion.div
+                                className="mt-8 text-center text-muted-foreground text-sm"
+                                initial={{ opacity: 0, y: 10 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.6, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                            >
+                                <div className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-gray-50 rounded-full">
+                                    <Clock className="w-4 h-4 text-ph/70" />
+                                    <span>Successfully placed with an average of 7-14 days time-to-hire</span>
+                                </div>
+                            </motion.div>
+                        </div>
+                    </div>
+                </motion.div>
+
                 {/* Database highlights */}
-                <motion.div 
+                <motion.div
                     className="mt-24 py-10 px-8 rounded-2xl glass-card border border-ph/10 overflow-hidden relative"
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -251,7 +362,7 @@ const Expertise = () => {
                 >
                     {/* Background gradient */}
                     <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-ph/5 to-transparent"></div>
-                    
+
                     <div className="relative z-10">
                         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
                             <div className="text-center md:text-left">
@@ -260,15 +371,15 @@ const Expertise = () => {
                                     Our database of pre-screened candidates covers the entire spectrum of wealth management roles, ensuring precise matches for your specific needs.
                                 </p>
                             </div>
-                            
+
                             <div className="flex flex-col sm:flex-row gap-8 items-center">
-                                <motion.div 
+                                <motion.div
                                     className="text-center"
                                     initial={{ opacity: 0, scale: 0.9 }}
                                     whileInView={{ opacity: 1, scale: 1 }}
                                     transition={{ duration: 0.5, delay: 0.5 }}
                                 >
-                                    <motion.div 
+                                    <motion.div
                                         className="text-5xl font-light text-foreground"
                                         initial={{ y: 20 }}
                                         whileInView={{ y: 0 }}
@@ -278,16 +389,16 @@ const Expertise = () => {
                                     </motion.div>
                                     <div className="mt-1 text-sm text-muted-foreground uppercase tracking-wider">Pre-screened candidates</div>
                                 </motion.div>
-                                
+
                                 <div className="h-14 w-px bg-gradient-to-b from-transparent via-gray-200 to-transparent hidden sm:block"></div>
-                                
-                                <motion.div 
+
+                                <motion.div
                                     className="text-center"
                                     initial={{ opacity: 0, scale: 0.9 }}
                                     whileInView={{ opacity: 1, scale: 1 }}
                                     transition={{ duration: 0.5, delay: 0.7 }}
                                 >
-                                    <motion.div 
+                                    <motion.div
                                         className="text-5xl font-light text-foreground"
                                         initial={{ y: 20 }}
                                         whileInView={{ y: 0 }}
@@ -317,7 +428,7 @@ const Expertise = () => {
                     >
                         <span className="relative">
                             Explore our full expertise
-                            <motion.span 
+                            <motion.span
                                 className="absolute bottom-0 left-0 w-full h-px bg-ph"
                                 initial={{ scaleX: 0, originX: 0 }}
                                 whileHover={{ scaleX: 1, originX: 0 }}
