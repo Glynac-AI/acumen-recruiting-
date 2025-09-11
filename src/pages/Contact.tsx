@@ -1,16 +1,18 @@
-// Contact page 
+//contact page
 import ContactHero from "@/components/contact/ContactHero";
 import ContactForm from "@/components/contact/ContactForm";
-import ContactTestimonial from "@/components/contact/ContactTestimonial";
 import ContactFAQ from "@/components/contact/ContactFAQ";
+import ContactInfo from "@/components/contact/ContactInfo";
+import ContactTestimonial from "@/components/contact/ContactTestimonial";
 
 const Contact = () => {
     return (
         <div className="min-h-screen bg-background">
             <ContactHero />
             <ContactForm />
-            <ContactTestimonial />
+            <ContactInfo />
             <ContactFAQ />
+            <ContactTestimonial />
         </div>
     );
 };

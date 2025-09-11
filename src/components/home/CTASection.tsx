@@ -1,9 +1,9 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { PhoneCall, ArrowRight, CheckCircle, Shield, Database, Sliders, Users, RefreshCw } from "lucide-react";
+import { ArrowRight, Shield, Database, Sliders, Users, RefreshCw, CheckCircle } from "lucide-react";
 
 const CTASection = () => {
-  // Benefits list - Updated with the 5 key value propositions from the document
+  // Value propositions based on the client document
   const valuePropositions = [
     {
       title: "Proven Industry Partner",
@@ -58,14 +58,14 @@ const CTASection = () => {
             transition={{ duration: 0.6 }}
           >
             <h2 className="text-4xl md:text-5xl font-display font-light tracking-wide text-white mb-6">
-              Begin Your Talent Discovery Journey
+              Transform Your Talent Acquisition
             </h2>
             <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
-              Schedule a consultation to explore how our approach can enhance your wealth management firm's talent acquisition strategy.
+              Partner with Acumen Recruiting to find exceptional wealth management talent at a fraction of traditional recruiting costs.
             </p>
           </motion.div>
 
-          {/* Value Propositions Section - Redesigned with deeper colors */}
+          {/* Value Propositions Section */}
           <motion.div
             className="mb-16"
             initial={{ opacity: 0, y: 20 }}
@@ -106,130 +106,61 @@ const CTASection = () => {
             </div>
           </motion.div>
 
+          {/* Testimonial */}
           <motion.div
-            className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
+            className="max-w-3xl mx-auto mb-16 p-6 rounded-xl bg-white/10 backdrop-blur-sm border border-white/15 shadow-lg shadow-black/10"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ delay: 0.2, duration: 0.6 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.4, duration: 0.6 }}
           >
-            <div>
-              <div className="bg-white/15 rounded-xl p-8 backdrop-blur-sm border border-white/15 shadow-xl shadow-black/10">
-                <h3 className="text-2xl font-light text-white mb-6">Schedule Your Consultation</h3>
-
-                <form className="space-y-5">
-                  <div>
-                    <label htmlFor="name" className="block text-sm font-medium mb-1.5 text-white/90">
-                      Full Name
-                    </label>
-                    <input
-                      type="text"
-                      id="name"
-                      className="w-full px-4 py-3 rounded-md border-0 bg-white/15 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/40 transition-all"
-                      placeholder="John Smith"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium mb-1.5 text-white/90">
-                      Email Address
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
-                      className="w-full px-4 py-3 rounded-md border-0 bg-white/15 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/40 transition-all"
-                      placeholder="john@example.com"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="company" className="block text-sm font-medium mb-1.5 text-white/90">
-                      Firm Name
-                    </label>
-                    <input
-                      type="text"
-                      id="company"
-                      className="w-full px-4 py-3 rounded-md border-0 bg-white/15 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/40 transition-all"
-                      placeholder="Your Wealth Management Firm"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="role" className="block text-sm font-medium mb-1.5 text-white/90">
-                      Role You're Hiring For
-                    </label>
-                    <select
-                      id="role"
-                      className="w-full px-4 py-3 rounded-md border-0 bg-white/15 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/40 transition-all"
-                    >
-                      <option value="" disabled selected className="text-gray-500">Select role type</option>
-                      <option value="wealth-manager">Wealth Manager / Advisor</option>
-                      <option value="financial-planner">Financial Planner</option>
-                      <option value="tax-advisor">Tax Advisor</option>
-                      <option value="estate-planning">Estate Planning Specialist</option>
-                      <option value="compliance">Compliance Officer</option>
-                      <option value="operations">Operations / Support</option>
-                      <option value="other">Other (Specify in Discussion)</option>
-                    </select>
-                  </div>
-
-                  <motion.button
-                    type="submit"
-                    className="w-full py-4 bg-white text-ph font-medium rounded-md hover:bg-opacity-90 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-black/10"
-                    whileHover={{ scale: 1.02, boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.15)" }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    Schedule Your Consultation
-                    <PhoneCall className="w-4 h-4" />
-                  </motion.button>
-                </form>
-              </div>
-            </div>
-
-            <div className="flex flex-col justify-center">
-              <h3 className="text-2xl font-light text-white mb-8">Why Partner with Acumen</h3>
-
-              <ul className="space-y-6 mb-10">
-                {[
-                  "Access to pre-screened wealth management talent",
-                  "Technology-enhanced candidate discovery",
-                  "Industry-specific expertise",
-                  "Accelerated hiring process"
-                ].map((benefit, index) => (
-                  <motion.li
-                    key={index}
-                    className="flex items-start gap-4"
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.4 + (index * 0.1), duration: 0.5 }}
-                  >
-                    <CheckCircle className="w-6 h-6 text-white shrink-0" />
-                    <span className="text-white/90 text-lg">{benefit}</span>
-                  </motion.li>
-                ))}
-              </ul>
-
-              <div className="p-6 rounded-xl bg-white/15 backdrop-blur-sm border border-white/15 shadow-lg shadow-black/10">
-                <blockquote className="text-white/90 italic">
-                  "Acumen helped us find our Senior Wealth Advisor in just 12 days - a position we had been struggling to fill for months."
-                </blockquote>
-                <div className="mt-3 text-white font-medium">
-                  — Managing Director, Private Wealth Firm
-                </div>
-              </div>
+            <blockquote className="text-white/90 italic text-lg text-center">
+              "Acumen helped us find our Senior Wealth Advisor in just 12 days - a position we had been struggling to fill for months."
+            </blockquote>
+            <div className="mt-4 text-white font-medium text-center">
+              — Managing Director, Private Wealth Firm
             </div>
           </motion.div>
 
+          {/* CTA buttons */}
           <motion.div
-            className="mt-16 text-center"
+            className="flex flex-col sm:flex-row justify-center gap-6"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.5, duration: 0.7 }}
+          >
+            <motion.a
+              href="/contact"
+              className="px-8 py-4 bg-white text-ph font-medium rounded-lg shadow-lg shadow-black/10 flex items-center justify-center gap-2"
+              whileHover={{ y: -3, boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.2)" }}
+              whileTap={{ scale: 0.98 }}
+            >
+              Schedule a Consultation
+              <ArrowRight className="w-4 h-4" />
+            </motion.a>
+
+            <motion.a
+              href="/services"
+              className="px-8 py-4 bg-transparent border border-white/20 text-white font-medium rounded-lg flex items-center justify-center gap-2 hover:bg-white/10 transition-colors"
+              whileHover={{ y: -3 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              Explore Our Services
+              <ArrowRight className="w-4 h-4" />
+            </motion.a>
+          </motion.div>
+
+          {/* Bottom note */}
+          <motion.div
+            className="mt-12 text-center"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.6, duration: 0.6 }}
           >
             <p className="text-white/80">
-              Not ready to schedule? Explore our <a href="/solutions" className="underline hover:text-white transition-colors">talent solutions</a> or learn more <a href="/about" className="underline hover:text-white transition-colors">about our approach</a>.
+              Typical time-to-hire: <span className="font-medium text-white">7-14 days</span> | Success rate: <span className="font-medium text-white">93%</span> | Available roles: <span className="font-medium text-white">Wealth management professionals at all levels</span>
             </p>
           </motion.div>
         </div>

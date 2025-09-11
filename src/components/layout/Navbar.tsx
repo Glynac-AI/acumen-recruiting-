@@ -1,13 +1,12 @@
-// src/components/Navbar.tsx
+// src/components/layout/Navbar.tsx
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ChevronDown, ChevronRight } from "lucide-react";
+import { Menu, X } from "lucide-react";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [serviceDropdownOpen, setServiceDropdownOpen] = useState(false);
   const location = useLocation();
 
   // Track scroll position
@@ -28,42 +27,23 @@ const Navbar = () => {
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
-    if (serviceDropdownOpen) setServiceDropdownOpen(false);
   };
 
-  const toggleServiceDropdown = () => {
-    setServiceDropdownOpen(!serviceDropdownOpen);
-  };
-
-  const closeMenus = () => {
+  const closeMenu = () => {
     setIsOpen(false);
-    setServiceDropdownOpen(false);
   };
 
   const isActive = (path) => {
     return location.pathname === path;
   };
 
-  // Simplified service items for the dropdown
-  const serviceItems = [
-    {
-      category: "Our Services",
-      items: [
-        { name: "Talent Snapshot™", path: "/services#snapshot" },
-        { name: "Talent DeepDive™", path: "/services#deepdive" },
-        { name: "Complete Talent Pack™", path: "/services#complete" },
-      ]
-    },
-    {
-      category: "Roles We Fill",
-      items: [
-        { name: "Wealth Managers", path: "/services#wealth-managers" },
-        { name: "Financial Planners", path: "/services#financial-planners" },
-        { name: "Tax Advisors", path: "/services#tax-advisors" },
-        { name: "Estate Planning", path: "/services#estate-planning" },
-        { name: "Compliance Officers", path: "/services#compliance" },
-      ]
-    }
+  // Navigation links for both desktop and mobile
+  const navLinks = [
+    { name: "Home", path: "/" },
+    { name: "Services", path: "/services" },
+    { name: "About", path: "/about" },
+    { name: "Pricing", path: "/pricing" },
+    { name: "Contact", path: "/contact" }
   ];
 
   return (
@@ -77,7 +57,7 @@ const Navbar = () => {
           <Link
             to="/"
             className="relative z-10 flex items-center"
-            onClick={closeMenus}
+            onClick={closeMenu}
           >
             <motion.span
               className={`text-2xl font-display font-light tracking-tight transition-colors duration-300 ${isScrolled ? 'text-[#0A2540]' : 'text-[#0A2540]'
@@ -91,89 +71,16 @@ const Navbar = () => {
 
           {/* Desktop Menu */}
           <div className="hidden lg:flex items-center space-x-1">
-            <NavLink href="/" active={isActive("/")} isScrolled={isScrolled}>
-              Home
-            </NavLink>
-
-            <div className="relative group">
-              <button
-                className={`px-5 py-2 transition-colors duration-300 rounded-full group flex items-center ${location.pathname.includes("/services")
-                  ? `${isScrolled ? 'text-[#4F6BFF]' : 'text-[#4F6BFF]'}`
-                  : `${isScrolled ? 'text-[#0A2540]' : 'text-[#0A2540]'} hover:text-[#4F6BFF]`
-                  }`}
-                onClick={toggleServiceDropdown}
-                onMouseEnter={() => setServiceDropdownOpen(true)}
-                onMouseLeave={() => setServiceDropdownOpen(false)}
+            {navLinks.map((link) => (
+              <NavLink
+                key={link.path}
+                href={link.path}
+                active={isActive(link.path)}
+                isScrolled={isScrolled}
               >
-                <span>Services</span>
-                <ChevronDown className="w-4 h-4 ml-1 transition-transform group-hover:rotate-180" />
-              </button>
-
-              {/* Services Mega Menu */}
-              <AnimatePresence>
-                {serviceDropdownOpen && (
-                  <motion.div
-                    className="absolute top-full left-0 mt-2 w-[500px] rounded-xl overflow-hidden shadow-xl bg-white border border-gray-100"
-                    initial={{ opacity: 0, y: -5, height: 0 }}
-                    animate={{ opacity: 1, y: 0, height: 'auto' }}
-                    exit={{ opacity: 0, y: -5, height: 0 }}
-                    transition={{ duration: 0.2 }}
-                    onMouseEnter={() => setServiceDropdownOpen(true)}
-                    onMouseLeave={() => setServiceDropdownOpen(false)}
-                  >
-                    <div className="p-6 grid grid-cols-2 gap-8">
-                      {serviceItems.map((category, idx) => (
-                        <div key={idx}>
-                          <h3 className="text-xs font-medium text-[#6B7280] uppercase tracking-wider mb-3">{category.category}</h3>
-                          <ul className="space-y-2">
-                            {category.items.map((item, index) => (
-                              <li key={index}>
-                                <Link
-                                  to={item.path}
-                                  className="group flex items-center text-[#0A2540] hover:text-[#4F6BFF] transition-colors py-1"
-                                  onClick={closeMenus}
-                                >
-                                  <span className="opacity-0 group-hover:opacity-100 transform translate-x-0 group-hover:-translate-x-2 transition-all">
-                                    <ChevronRight className="w-3 h-3" />
-                                  </span>
-                                  <span className="transform translate-x-0 group-hover:-translate-x-1 transition-transform">
-                                    {item.name}
-                                  </span>
-                                </Link>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Footer with CTA */}
-                    <div className="p-4 bg-gradient-to-r from-[#f5f8ff] to-white border-t border-gray-100">
-                      <Link
-                        to="/services"
-                        className="text-sm text-[#4F6BFF] font-medium hover:underline flex items-center"
-                        onClick={closeMenus}
-                      >
-                        <span>View all services</span>
-                        <ChevronRight className="w-4 h-4 ml-1" />
-                      </Link>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            <NavLink href="/about" active={isActive("/about")} isScrolled={isScrolled}>
-              About
-            </NavLink>
-
-            <NavLink href="/pricing" active={isActive("/pricing")} isScrolled={isScrolled}>
-              Pricing
-            </NavLink>
-
-            <NavLink href="/contact" active={isActive("/contact")} isScrolled={isScrolled}>
-              Contact
-            </NavLink>
+                {link.name}
+              </NavLink>
+            ))}
 
             <motion.div
               whileHover={{ scale: 1.02 }}
@@ -225,92 +132,55 @@ const Navbar = () => {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className="fixed inset-0 bg-white z-40 lg:hidden pt-24 overflow-y-auto flex flex-col"
+            className="fixed inset-0 bg-white z-40 lg:hidden pt-24 overflow-y-auto"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
           >
             <div className="container px-6 py-6 flex flex-col h-full">
-              <Link
-                to="/"
-                className="flex items-center py-4 text-xl font-medium text-[#0A2540]"
-                onClick={closeMenus}
-              >
-                Home
-              </Link>
-
-              <button
-                className="flex items-center justify-between w-full py-4 text-xl font-medium text-[#0A2540]"
-                onClick={toggleServiceDropdown}
-              >
-                <span>Services</span>
-                <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${serviceDropdownOpen ? 'rotate-180' : ''
-                  }`} />
-              </button>
-
-              {/* Mobile Services Dropdown */}
-              <AnimatePresence>
-                {serviceDropdownOpen && (
-                  <motion.div
-                    className="pl-4 mb-4 space-y-6"
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3 }}
+              {/* Mobile Nav Links */}
+              <div className="space-y-2 mb-8">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    className={`flex items-center py-4 text-xl font-medium ${isActive(link.path) ? 'text-[#4F6BFF]' : 'text-[#0A2540]'
+                      }`}
+                    onClick={closeMenu}
                   >
-                    {serviceItems.map((category, idx) => (
-                      <div key={idx} className="mb-4">
-                        <h3 className="text-xs font-medium text-[#6B7280] uppercase tracking-wider mb-3">{category.category}</h3>
-                        <ul className="space-y-3">
-                          {category.items.map((item, index) => (
-                            <li key={index}>
-                              <Link
-                                to={item.path}
-                                className="flex items-center py-2 text-[#0A2540]"
-                                onClick={closeMenus}
-                              >
-                                <ChevronRight className="w-4 h-4 mr-2 text-[#4F6BFF]" />
-                                {item.name}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                    {link.name}
+                  </Link>
+                ))}
+              </div>
 
-              <Link
-                to="/about"
-                className="flex items-center py-4 text-xl font-medium text-[#0A2540]"
-                onClick={closeMenus}
-              >
-                About
-              </Link>
+              {/* Mobile Contact Info */}
+              <div className="py-6 border-t border-gray-100">
+                <h3 className="text-sm font-medium text-[#6B7280] uppercase tracking-wider mb-4">
+                  Contact Us
+                </h3>
+                <div className="space-y-3 mb-6">
+                  <div className="flex items-center text-[#505c6e]">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#4F6BFF]/70 mr-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    </svg>
+                    <span>(773) 430-3534</span>
+                  </div>
+                  <div className="flex items-center text-[#505c6e]">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#4F6BFF]/70 mr-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    <span>info@acumenrecruiting.com</span>
+                  </div>
+                </div>
+              </div>
 
-              <Link
-                to="/pricing"
-                className="flex items-center py-4 text-xl font-medium text-[#0A2540]"
-                onClick={closeMenus}
-              >
-                Pricing
-              </Link>
-
-              <Link
-                to="/contact"
-                className="flex items-center py-4 text-xl font-medium text-[#0A2540]"
-                onClick={closeMenus}
-              >
-                Contact
-              </Link>
-
+              {/* Mobile CTA Button */}
               <div className="mt-auto pt-6 border-t border-gray-100">
                 <Link
                   to="/contact"
-                  className="flex items-center justify-center w-full py-4 bg-[#4F6BFF] text-white text-base font-medium rounded-full shadow-sm"
-                  onClick={closeMenus}
+                  className="flex items-center justify-center w-full py-4 bg-[#4F6BFF] text-white text-base font-medium rounded-lg shadow-sm"
+                  onClick={closeMenu}
                 >
                   Get Started
                 </Link>
@@ -329,8 +199,8 @@ const NavLink = ({ href, active, isScrolled, children }) => {
     <Link
       to={href}
       className={`px-5 py-2 transition-colors duration-300 rounded-full ${active
-        ? `${isScrolled ? 'text-[#4F6BFF]' : 'text-[#4F6BFF]'}`
-        : `${isScrolled ? 'text-[#0A2540]' : 'text-[#0A2540]'} hover:text-[#4F6BFF]`
+          ? `${isScrolled ? 'text-[#4F6BFF]' : 'text-[#4F6BFF]'}`
+          : `${isScrolled ? 'text-[#0A2540]' : 'text-[#0A2540]'} hover:text-[#4F6BFF]`
         }`}
     >
       {children}
