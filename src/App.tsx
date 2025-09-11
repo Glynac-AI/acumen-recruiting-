@@ -7,6 +7,7 @@ import Footer from "@/components/layout/Footer";
 import Home from "@/pages/Home";
 import Services from "./pages/Services";
 import Pricing from "./pages/Pricing";
+import About from "./pages/About";
 
 const App = () => (
   <BrowserRouter>
@@ -18,6 +19,7 @@ const App = () => (
             <Route path="/" element={<Home />} />
             <Route path="/services" element={<Services />} />
             <Route path="/pricing" element={<Pricing />} />
+            <Route path="/about" element={<About />} />
           </Routes>
         </main>
         <Footer />
