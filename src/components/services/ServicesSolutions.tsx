@@ -1,481 +1,514 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { motion, useScroll, useTransform, AnimatePresence, useReducedMotion } from "framer-motion";
-import {
-  Play, Users, Layers, ArrowRight, Check,
-  CalendarRange, Sparkles, Workflow, Handshake,
-  FileText, Search
-} from "lucide-react";
+// src/components/services/ServicesSolutions.tsx
+import React, { useRef, useState } from "react";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { Play, Users, Layers, ArrowRight, Check, PhoneCall, Palette, Search, ListChecks, Handshake, ChevronRight } from "lucide-react";
 
+const ServicesSolutions = () => {
+  const [activeService, setActiveService] = useState("snapshot");
+  const [activeStep, setActiveStep] = useState("consultation");
+  const sectionRef = useRef(null);
 
-const kbdRing =
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#4F6BFF] focus-visible:ring-offset-white";
-
-const ServiceTab: React.FC<{
-  active: boolean;
-  onClick: () => void;
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  tabIndex?: number;
-  onKeyDown?: (e: React.KeyboardEvent) => void;
-}> = ({ active, onClick, icon, title, description, tabIndex = 0, onKeyDown }) => (
-  <button
-    onClick={onClick}
-    onKeyDown={onKeyDown}
-    tabIndex={tabIndex}
-    aria-pressed={active}
-    className={`flex-1 relative py-6 px-6 rounded-xl transition-all duration-300 overflow-hidden text-left ${kbdRing} ${
-      active ? "bg-white shadow-md border border-[#4F6BFF1A]"
-             : "bg-white/60 hover:bg-white hover:shadow-sm border border-gray-200/70"
-    }`}
-  >
-    {active && (
-      <motion.div
-        className="absolute inset-0 bg-gradient-to-br from-[#4F6BFF0D] to-transparent -z-10"
-        layoutId="serviceTabHighlight"
-        transition={{ duration: 0.35 }}
-      />
-    )}
-    <div className="flex items-center gap-4">
-      <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-        active ? "bg-[#4F6BFF1A] text-[#4F6BFF]" : "bg-gray-100 text-gray-400"
-      }`}>
-        {icon}
-      </div>
-      <div>
-        <div className={`text-base font-medium ${active ? "text-[#0A2540]" : "text-gray-900"}`}>{title}</div>
-        <p className="text-sm text-gray-500 line-clamp-1">{description}</p>
-      </div>
-    </div>
-  </button>
-);
-
-const ServicesSolutions: React.FC = () => {
-  const [activeService, setActiveService] = useState<"snapshot"|"deepdive"|"complete">("snapshot");
-  const sectionRef = useRef<HTMLElement | null>(null);
-  const reduced = useReducedMotion();
-
-  // Scroll decor
+  // Scroll-based animations for header
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ["start end", "end start"]
+    offset: ["start end", "end start"],
   });
-  const bgY = useTransform(scrollYProgress, [0, 1], [0, 50]);
+
   const titleOpacity = useTransform(scrollYProgress, [0.05, 0.15], [0, 1]);
   const titleY = useTransform(scrollYProgress, [0.05, 0.15], [30, 0]);
+  const backgroundY = useTransform(scrollYProgress, [0, 1], [0, 50]);
 
-  const services = useMemo(() => ([
+  // Services data (tabs)
+  const services = [
     {
-      id: "snapshot" as const,
+      id: "snapshot",
       title: "Talent Snapshot™",
-      description: "Focused candidate introductions for immediate signal.",
+      description:
+        "Brief, focused candidate introductions that provide immediate insight into fit and capability.",
+      details: [
+        "Pre-recorded video introductions from candidates",
+        "Custom screening questions tailored to your requirements",
+        "Efficient initial assessment of candidate fit",
+        "Immediate access via our secure client portal",
+      ],
+      benefits: [
+        "Quickly review multiple candidates",
+        "See authentic personality and communication style",
+        "Share candidate videos with team members",
+        "Reduce scheduling conflicts and time constraints",
+      ],
       icon: <Play className="w-5 h-5" />,
       color: "#4F6BFF",
-      details: [
-        "Pre-recorded video introductions",
-        "Role-aligned screening prompts",
-        "Rapid shortlists with scannable notes",
-        "Immediate access via secure client portal",
-      ],
-      benefits: [
-        "Review more candidates in less time",
-        "See communication style authentically",
-        "Easy shareability with stakeholders",
-        "Fewer scheduling conflicts",
-      ],
       pricing: [
-        { level: "0–60k roles", price: "20 for $200 · 50 for $450 · 100 for $800" },
-        { level: "60k–120k roles", price: "Pricing doubles" },
-        { level: "120k–300k roles", price: "Pricing triples" },
-      ]
+        { level: "0-60k roles", price: "20 for $200 | 50 for $450 | 100 for $800" },
+        { level: "60k-120k roles", price: "Pricing doubles" },
+        { level: "120k-300k roles", price: "Pricing triples" },
+      ],
     },
     {
-      id: "deepdive" as const,
+      id: "deepdive",
       title: "Talent DeepDive™",
-      description: "Structured interviews for nuanced capability mapping.",
-      icon: <Users className="w-5 h-5" />,
-      color: "#6366f1",
+      description:
+        "Structured, in-depth conversations that reveal nuanced understanding of experience and expertise.",
       details: [
         "Recruiter-led structured interviews",
-        "Behavioral + situational prompts",
-        "Competency scorecard and notes",
-        "Clear strengths/risks callouts",
+        "Comprehensive assessment of skills and experience",
+        "Behavioral and situational questions",
+        "Detailed insights into candidate capabilities",
       ],
       benefits: [
-        "Deeper technical & non-technical signal",
-        "Bias-reducing comparability",
-        "Role-specific probes",
-        "Third-party professionalism",
+        "Deeper evaluation of technical competencies",
+        "Assessment of cultural fit and soft skills",
+        "Customized questions for specific role requirements",
+        "Professional third-party assessment",
       ],
+      icon: <Users className="w-5 h-5" />,
+      color: "#6366f1",
       pricing: [
-        { level: "0–60k roles", price: "10 for $300 · 20 for $550 · 50 for $1,250" },
-        { level: "60k–120k roles", price: "Pricing doubles" },
-        { level: "120k–300k roles", price: "Pricing triples" },
-      ]
+        { level: "0-60k roles", price: "10 for $300 | 20 for $550 | 50 for $1,250" },
+        { level: "60k-120k roles", price: "Pricing doubles" },
+        { level: "120k-300k roles", price: "Pricing triples" },
+      ],
     },
     {
-      id: "complete" as const,
+      id: "complete",
       title: "Complete Talent Pack™",
-      description: "Snapshot + DeepDive for critical roles.",
-      icon: <Layers className="w-5 h-5" />,
-      color: "#4F6BFF",
+      description:
+        "A comprehensive approach combining both methodologies for thorough talent discovery.",
       details: [
-        "Combined methodologies",
-        "Maximum signal density",
-        "Comprehensive screening",
-        "Ideal for senior/complex roles",
+        "Combined Snapshot and DeepDive methodologies",
+        "Maximum candidate insights for critical roles",
+        "Comprehensive screening across all dimensions",
+        "Optimal approach for senior or complex positions",
       ],
       benefits: [
-        "Highest decision confidence",
-        "Time saved for your panel",
-        "Multi-angle candidate view",
-        "Smoother close plan",
+        "Most thorough candidate evaluation",
+        "Ideal for high-stakes hiring decisions",
+        "Maximum time savings for your team",
+        "Complete candidate profile from multiple angles",
       ],
+      icon: <Layers className="w-5 h-5" />,
+      color: "#4F6BFF",
       pricing: [
-        { level: "0–60k roles", price: "Starter $450 · Growth $900 · Enterprise $2,000" },
-        { level: "60k–120k roles", price: "Pricing doubles" },
-        { level: "120k–300k roles", price: "Pricing triples" },
-      ]
-    }
-  ]), []);
+        { level: "0-60k roles", price: "Starter: $450 | Growth: $900 | Enterprise: $2,000" },
+        { level: "60k-120k roles", price: "Pricing doubles" },
+        { level: "120k-300k roles", price: "Pricing triples" },
+      ],
+    },
+  ];
 
-  const active = services.find(s => s.id === activeService)!;
+  const activeServiceData = services.find((s) => s.id === activeService) || services[0];
 
-  // Keyboard nav for tabs
-  const tabOrder = services.map(s => s.id);
-  const onTabKey = (e: React.KeyboardEvent, id: typeof activeService) => {
-    if (e.key === "ArrowRight" || e.key === "ArrowDown") {
-      e.preventDefault();
-      const idx = tabOrder.indexOf(id);
-      setActiveService(tabOrder[(idx + 1) % tabOrder.length]);
-    } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
-      e.preventDefault();
-      const idx = tabOrder.indexOf(id);
-      setActiveService(tabOrder[(idx - 1 + tabOrder.length) % tabOrder.length]);
-    } else if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      // already selects via focus; noop
-    }
-  };
+  // --- ACUMEN EXPERIENCE (redesigned) ---
+  const steps = [
+    {
+      id: "consultation",
+      no: "01",
+      title: "Consultation",
+      blurb:
+        "Focused conversation to map goals, constraints, team dynamics and the ideal profile.",
+      bullets: [
+        "Success criteria & culture mapping",
+        "Stakeholder alignment & timelines",
+        "Target profiles and exclusions",
+      ],
+      icon: <PhoneCall className="w-5 h-5" />,
+    },
+    {
+      id: "curation",
+      no: "02",
+      title: "Curation",
+      blurb:
+        "A tailored approach that mirrors how your firm evaluates talent—and how candidates engage.",
+      bullets: [
+        "Interview plan & process design",
+        "Screening rubric & brief creation",
+        "Sourcing channels & messaging",
+      ],
+      icon: <Palette className="w-5 h-5" />,
+    },
+    {
+      id: "discovery",
+      no: "03",
+      title: "Discovery",
+      blurb:
+        "Signal-rich pipeline from outbound, referrals and our private network to calibrate quickly.",
+      bullets: [
+        "Warm outreach & referrals",
+        "Competency-based pre-screens",
+        "Market feedback loop",
+      ],
+      icon: <Search className="w-5 h-5" />,
+    },
+    {
+      id: "shortlist",
+      no: "04",
+      title: "Shortlist",
+      blurb:
+        "Comparable candidate packets with the same artifacts so decisions are fast and fair.",
+      bullets: [
+        "Structured profile packets",
+        "Recorded intros & notes",
+        "Next-step recommendations",
+      ],
+      icon: <ListChecks className="w-5 h-5" />,
+    },
+    {
+      id: "placement",
+      no: "05",
+      title: "Placement",
+      blurb:
+        "Offer design and close support, then proactive onboarding touchpoints to ensure outcomes.",
+      bullets: [
+        "Compensation & reference checks",
+        "Close strategy & acceptance",
+        "Post-start onboarding support",
+      ],
+      icon: <Handshake className="w-5 h-5" />,
+    },
+  ];
 
   return (
-    <section ref={sectionRef} id="services" className="relative bg-white py-28 overflow-hidden">
-      {/* Ambient gradient */}
-      <motion.div className="absolute inset-0 pointer-events-none" style={{ y: bgY }}>
-        <div className="absolute inset-0 bg-[radial-gradient(1000px_420px_at_50%_-10%,rgba(79,107,255,0.06),transparent)]" />
-      </motion.div>
-
-      {/* micro texture */}
-      <div
-        className="absolute inset-0 opacity-[0.02] pointer-events-none"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-          backgroundSize: "220px"
-        }}
+    <section ref={sectionRef} className="py-36 relative overflow-hidden bg-white" id="services">
+      {/* Background wash */}
+      <motion.div
+        className="absolute inset-0 bg-gradient-to-b from-white to-gray-50/30 pointer-events-none"
+        style={{ y: backgroundY }}
       />
+      <div className="absolute inset-0 opacity-[0.02]" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+        backgroundSize: "200px",
+      }} />
 
       <div className="container mx-auto px-6 relative z-10">
-        {/* Header */}
+        {/* Solutions header */}
         <motion.div
-          className="max-w-3xl mx-auto text-center mb-16"
+          className="max-w-3xl mx-auto text-center mb-24"
           style={{ opacity: titleOpacity, y: titleY }}
         >
-          <span className="inline-block py-1.5 px-4 bg-[#4F6BFF1A] text-[#4F6BFF] font-medium rounded-full text-sm mb-6">
+          <motion.span
+            className="inline-block py-1.5 px-4 bg-ph/10 text-ph font-medium rounded-full text-sm mb-6"
+            initial={{ opacity: 0, y: -10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+          >
             Our Solutions
-          </span>
-          <h2 className="text-4xl md:text-5xl font-display font-light tracking-tight text-[#0A2540]">
+          </motion.span>
+
+          <motion.h2
+            className="text-4xl md:text-5xl font-display font-light tracking-tight text-foreground mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
+          >
             Tailored Recruiting Solutions
-          </h2>
-          <p className="mt-4 text-lg md:text-xl text-[#505c6e]">
-            Calm, structured, and outcome-focused—from first shortlist to signed offer.
-          </p>
+          </motion.h2>
+
+          <motion.p
+            className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, delay: 0.1 }}
+          >
+            Discover our thoughtfully designed approaches to talent identification, each crafted to address specific recruiting needs.
+          </motion.p>
         </motion.div>
 
-        {/* Tabs */}
+        {/* Services Tabs */}
         <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row gap-4 mb-10" role="tablist" aria-label="Recruiting solutions">
-            {services.map((s) => (
-              <ServiceTab
-                key={s.id}
-                active={activeService === s.id}
-                onClick={() => setActiveService(s.id)}
-                onKeyDown={(e) => onTabKey(e, s.id)}
-                icon={s.icon}
-                title={s.title}
-                description={s.description}
-              />
+          <div className="flex flex-col md:flex-row gap-4 mb-16">
+            {services.map((service) => (
+              <motion.button
+                key={service.id}
+                id={`${service.id}`}
+                className={`flex-1 relative py-6 px-6 rounded-xl transition-all duration-300 overflow-hidden ${
+                  activeService === service.id
+                    ? "bg-white shadow-md border border-ph/10"
+                    : "bg-white/50 hover:bg-white hover:shadow-sm"
+                }`}
+                onClick={() => setActiveService(service.id)}
+                whileHover={{ y: -3 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                {activeService === service.id && (
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-br from-ph/5 to-transparent -z-10"
+                    layoutId="serviceTabHighlight"
+                    transition={{ duration: 0.3 }}
+                  />
+                )}
+
+                <div className="flex items-center gap-4">
+                  <div
+                    className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                      activeService === service.id ? "bg-ph/10 text-ph" : "bg-gray-100 text-gray-400"
+                    }`}
+                  >
+                    {service.icon}
+                  </div>
+                  <div className="text-left">
+                    <h3
+                      className={`font-medium text-lg ${
+                        activeService === service.id ? "text-ph" : "text-foreground"
+                      }`}
+                    >
+                      {service.title}
+                    </h3>
+                    <p className="text-muted-foreground text-sm line-clamp-1">{service.description}</p>
+                  </div>
+                </div>
+              </motion.button>
             ))}
           </div>
 
-          {/* Active panel */}
-          <AnimatePresence mode="wait" initial={false}>
+          {/* Service Details */}
+          <AnimatePresence mode="wait">
             <motion.div
-              key={active.id}
-              initial={reduced ? { opacity: 0 } : { opacity: 0, y: 16 }}
-              animate={reduced ? { opacity: 1 } : { opacity: 1, y: 0 }}
-              exit={reduced ? { opacity: 0 } : { opacity: 0, y: -16 }}
-              transition={{ duration: 0.35 }}
+              key={activeService}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
             >
-              <div className="rounded-3xl border border-gray-200/70 bg-white/70 backdrop-blur shadow-sm overflow-hidden">
-                <div className="p-8 md:p-10">
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="p-10">
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                    {/* left */}
+                    {/* Left */}
                     <div>
-                      <div className="flex items-center gap-3 mb-6">
-                        <div
-                          className="p-2 rounded-lg"
-                          style={{ backgroundColor: `${active.color}1A` }}
-                        >
-                          <div className="text-[#4F6BFF]">{active.icon}</div>
-                        </div>
-                        <h3 className="text-2xl font-display font-light text-[#0A2540]">
-                          {active.title}
+                      <motion.div
+                        className="flex items-center gap-3 mb-6"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5 }}
+                      >
+                        <div className="p-2 rounded-lg bg-ph/10 text-ph">{activeServiceData.icon}</div>
+                        <h3 className="text-2xl font-display font-light text-foreground">
+                          {activeServiceData.title}
                         </h3>
-                      </div>
-                      <p className="text-[#505c6e] mb-8">
-                        {active.description}
-                      </p>
-                      <div>
-                        <h4 className="font-medium text-[#0A2540] mb-3">Key features</h4>
-                        <ul className="space-y-3">
-                          {active.details.map((d, i) => (
-                            <li key={i} className="flex gap-3 text-[#505c6e]">
-                              <Check className="w-5 h-5 text-[#4F6BFF] mt-0.5 shrink-0" />
-                              <span>{d}</span>
-                            </li>
+                      </motion.div>
+
+                      <motion.p
+                        className="text-muted-foreground mb-8"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.5, delay: 0.1 }}
+                      >
+                        {activeServiceData.description}
+                      </motion.p>
+
+                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.2 }}>
+                        <h4 className="font-medium text-foreground mb-4">Key Features</h4>
+                        <ul className="space-y-3 mb-8">
+                          {activeServiceData.details.map((detail, index) => (
+                            <motion.li
+                              key={index}
+                              className="flex items-start gap-3"
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: 0.3 + index * 0.1 }}
+                            >
+                              <Check className="w-5 h-5 text-ph mt-0.5 shrink-0" />
+                              <span className="text-muted-foreground">{detail}</span>
+                            </motion.li>
                           ))}
                         </ul>
-                      </div>
+                      </motion.div>
                     </div>
 
-                    {/* right */}
+                    {/* Right */}
                     <div>
-                      <h4 className="font-medium text-[#0A2540] mb-3">Benefits</h4>
-                      <ul className="space-y-3 mb-8">
-                        {active.benefits.map((b, i) => (
-                          <li key={i} className="flex gap-3 text-[#505c6e]">
-                            <Check className="w-5 h-5 text-[#4F6BFF] mt-0.5 shrink-0" />
-                            <span>{b}</span>
-                          </li>
-                        ))}
-                      </ul>
+                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.3 }}>
+                        <h4 className="font-medium text-foreground mb-4">Benefits</h4>
+                        <ul className="space-y-3 mb-8">
+                          {activeServiceData.benefits.map((benefit, index) => (
+                            <motion.li
+                              key={index}
+                              className="flex items-start gap-3"
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: 0.4 + index * 0.1 }}
+                            >
+                              <Check className="w-5 h-5 text-ph mt-0.5 shrink-0" />
+                              <span className="text-muted-foreground">{benefit}</span>
+                            </motion.li>
+                          ))}
+                        </ul>
+                      </motion.div>
 
-                      <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-                        <h4 className="font-medium text-[#0A2540] mb-3">Pricing</h4>
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.5, delay: 0.5 }}
+                        className="bg-gray-50 p-6 rounded-xl"
+                      >
+                        <h4 className="font-medium text-foreground mb-4">Pricing</h4>
                         <div className="space-y-4">
-                          {active.pricing.map((t, i) => (
-                            <div key={i} className="pb-4 border-b border-gray-200 last:border-0 last:pb-0">
-                              <div className="text-sm font-medium text-[#0A2540]">{t.level}</div>
-                              <div className="text-[#505c6e]">{t.price}</div>
+                          {activeServiceData.pricing.map((tier, index) => (
+                            <div key={index} className="pb-4 border-b border-gray-100 last:border-0 last:pb-0">
+                              <div className="font-medium text-sm mb-1">{tier.level}</div>
+                              <div className="text-muted-foreground">{tier.price}</div>
                             </div>
                           ))}
                         </div>
-                        <div className="mt-6 pt-4 border-t border-gray-200 text-sm text-[#505c6e] flex gap-2">
-                          <Check className="w-4 h-4 text-[#4F6BFF] mt-0.5" />
-                          Success fee applies per hire.
+                        <div className="mt-6 pt-4 border-t border-gray-200">
+                          <div className="text-sm text-muted-foreground flex items-start gap-2">
+                            <span className="text-ph mt-0.5">
+                              <Check className="w-4 h-4" />
+                            </span>
+                            Success fee applies per hire
+                          </div>
                         </div>
-                      </div>
+                      </motion.div>
                     </div>
                   </div>
                 </div>
 
-                {/* panel footer */}
-                <div className="bg-gray-50/80 border-t border-gray-200 p-6 flex flex-col sm:flex-row gap-4 items-center justify-between">
-                  <p className="text-sm text-[#505c6e]">
-                    Ready to move a role forward with {active.title}?
+                {/* CTA footer */}
+                <div className="bg-gray-50 p-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+                  <p className="text-muted-foreground text-sm">
+                    Ready to transform your talent acquisition with {activeServiceData.title}?
                   </p>
-                  <a
+                  <motion.a
                     href="/contact"
-                    className={`inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#4F6BFF] text-white text-sm hover:bg-[#445fe6] transition ${kbdRing}`}
+                    className="inline-flex items-center gap-2 px-5 py-2 bg-ph text-white text-sm font-medium rounded-md transition-colors hover:bg-ph-dark"
+                    whileHover={{ x: 3 }}
+                    whileTap={{ scale: 0.98 }}
                   >
-                    Get started <ArrowRight className="w-4 h-4" />
-                  </a>
+                    Get Started
+                    <ArrowRight className="w-4 h-4" />
+                  </motion.a>
                 </div>
               </div>
             </motion.div>
           </AnimatePresence>
         </div>
 
-        {/* ================
-            ACUMEN EXPERIENCE (2026)
-           ================ */}
-        <div id="experience" className="max-w-6xl mx-auto mt-20">
-          <div className="rounded-3xl border border-gray-200/70 bg-white/70 backdrop-blur shadow-sm overflow-hidden">
-            {/* header row */}
-            <div className="p-8 md:p-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-              <div>
-                <span className="inline-block py-1 px-3 text-xs rounded-full bg-[#4F6BFF1A] text-[#4F6BFF]">Our Process</span>
-                <h3 className="mt-3 text-3xl md:text-4xl font-display font-light text-[#0A2540]">
-                  The Acumen Experience
-                </h3>
-                <p className="mt-3 text-[#505c6e]">
-                  A deliberately calm journey—clear scorecards, tight feedback loops, and no guesswork.
-                </p>
-              </div>
-              <a
-                href="/contact"
-                className={`inline-flex items-center gap-2 px-5 py-2 rounded-full bg-black text-white text-sm hover:bg-gray-900 transition ${kbdRing}`}
-              >
-                Talk to us <ArrowRight className="w-4 h-4" />
-              </a>
-            </div>
+        {/* ---------- ACUMEN EXPERIENCE (2026 UX) ---------- */}
+        <section id="acumen-experience" className="mt-28 relative">
+          {/* soft radial bg just for this section */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 -z-10"
+            style={{
+              background:
+                "radial-gradient(900px 500px at 50% -10%, rgba(79,107,255,0.08), transparent 60%)",
+            }}
+          />
 
-            {/* body */}
-            <div className="px-8 md:px-10 pb-10">
-              <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-10">
-                {/* sticky rail */}
-                <div className="lg:sticky lg:top-24 h-fit">
-                  <div className="rounded-2xl border border-gray-200 bg-white p-5">
-                    <div className="text-sm font-medium text-[#0A2540] mb-4">Overview</div>
-                    <ol className="space-y-3 text-sm text-[#505c6e]">
-                      <li className="flex items-center gap-3">
-                        <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-[12px] font-medium">01</div>
-                        Consultation
-                      </li>
-                      <li className="flex items-center gap-3">
-                        <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-[12px] font-medium">02</div>
-                        Sourcing
-                      </li>
-                      <li className="flex items-center gap-3">
-                        <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-[12px] font-medium">03</div>
-                        Interviews
-                      </li>
-                      <li className="flex items-center gap-3">
-                        <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-[12px] font-medium">04</div>
-                        Decision & Close
-                      </li>
-                    </ol>
-                  </div>
-                </div>
+          {/* Header */}
+          <div className="text-center mb-10">
+            <span className="inline-flex items-center gap-2 rounded-full bg-[#4F6BFF]/10 text-[#4F6BFF] px-3 py-1 text-xs font-medium">
+              Our Process
+            </span>
+            <h3 className="mt-4 text-4xl md:text-5xl font-display font-light tracking-tight text-[#0A2540]">
+              The Acumen Experience
+            </h3>
+            <p className="mt-4 text-[#505c6e] text-lg max-w-3xl mx-auto">
+              A modern, signal-first journey from consultation to placement—designed for clarity, speed,
+              and better decisions.
+            </p>
+          </div>
 
-                {/* steps grid */}
-                <div className="grid sm:grid-cols-2 gap-6">
-                  {[
-                    {
-                      title: "Consultation",
-                      icon: <CalendarRange className="w-5 h-5" />,
-                      copy:
-                        "Define the scorecard, align the panel, and set a predictable timeline. We remove ambiguity from day one."
-                    },
-                    {
-                      title: "Sourcing",
-                      icon: <Sparkles className="w-5 h-5" />,
-                      copy:
-                        "Targeted outreach and calibration cycles produce crisp shortlists with scannable notes you can trust."
-                    },
-                    {
-                      title: "Interviews",
-                      icon: <Workflow className="w-5 h-5" />,
-                      copy:
-                        "We handle prep and scheduling, then keep tight feedback loops so momentum never stalls."
-                    },
-                    {
-                      title: "Decision & Close",
-                      icon: <Handshake className="w-5 h-5" />,
-                      copy:
-                        "References, offer strategy, close plan, and 30/60/90 onboarding check-ins to ensure success."
-                    }
-                  ].map((s, i) => (
-                    <motion.div
-                      key={i}
-                      initial={reduced ? { opacity: 0 } : { opacity: 0, y: 12 }}
-                      whileInView={reduced ? { opacity: 1 } : { opacity: 1, y: 0 }}
-                      viewport={{ once: true, amount: 0.3 }}
-                      transition={{ duration: 0.35, delay: i * 0.05 }}
-                      className="rounded-2xl border border-gray-200 bg-white p-6 hover:shadow-sm transition-shadow"
+          {/* Grid: sticky rail + cards */}
+          <div className="grid lg:grid-cols-[280px,1fr] gap-10">
+            {/* Sticky progress rail */}
+            <aside className="hidden lg:block relative">
+              <div className="absolute left-5 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-[#4F6BFF]/15 to-transparent" />
+              <div className="sticky top-28 space-y-2">
+                {steps.map((s, i) => {
+                  const isActive = activeStep === s.id;
+                  return (
+                    <a
+                      key={s.id}
+                      href={`#${s.id}`}
+                      className={`group flex items-center gap-3 rounded-xl px-3 py-2 transition-colors ${
+                        isActive ? "bg-[#4F6BFF]/5" : "hover:bg-gray-50"
+                      }`}
                     >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-gray-100 text-[#0A2540] flex items-center justify-center">
-                          {s.icon}
-                        </div>
-                        <div className="text-lg font-medium text-[#0A2540]">{s.title}</div>
+                      <div
+                        className={`relative grid place-items-center w-10 h-10 rounded-full border transition-colors ${
+                          isActive ? "border-[#4F6BFF]" : "border-gray-200"
+                        }`}
+                      >
+                        <span className={`text-sm font-medium ${isActive ? "text-[#4F6BFF]" : "text-gray-500"}`}>
+                          {s.no}
+                        </span>
+                        <span
+                          className={`absolute inset-0 rounded-full -z-10 blur-md transition-opacity ${
+                            isActive ? "opacity-100 bg-[#4F6BFF]/20" : "opacity-0"
+                          }`}
+                        />
                       </div>
-                      <p className="mt-3 text-[#505c6e]">{s.copy}</p>
-                    </motion.div>
-                  ))}
-                </div>
+                      <div className="flex-1">
+                        <div className={`text-sm ${isActive ? "text-[#0A2540]" : "text-gray-600"}`}>{s.title}</div>
+                        <div className="text-xs text-gray-400">Step {i + 1} of {steps.length}</div>
+                      </div>
+                      <ChevronRight className={`w-4 h-4 ${isActive ? "text-[#4F6BFF]" : "text-gray-300"}`} />
+                    </a>
+                  );
+                })}
               </div>
+            </aside>
 
-              {/* deliverables + options */}
-              <div className="mt-8 grid md:grid-cols-2 gap-6">
-                <div className="rounded-2xl border border-gray-200 bg-white p-6">
-                  <h4 className="text-lg font-medium text-[#0A2540]">Deliverables you’ll receive</h4>
-                  <ul className="mt-4 space-y-3 text-[#505c6e]">
-                    {[
-                      "Role scorecard & intake brief",
-                      "Calibrated shortlist with structured notes",
-                      "Interview coordination & debrief templates",
-                      "Reference snapshots and risk flags",
-                      "Offer support and close plan",
-                      "30/60/90 onboarding check-ins",
-                    ].map((l, i) => (
-                      <li key={i} className="flex gap-2">
-                        <span className="mt-2 inline-block w-1.5 h-1.5 rounded-full bg-[#0A2540]" />
-                        {l}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="rounded-2xl border border-gray-200 bg-white p-6">
-                  <h4 className="text-lg font-medium text-[#0A2540]">Engagement options</h4>
-                  <div className="mt-4 grid sm:grid-cols-3 gap-4">
-                    {[
-                      { t: "Snapshot™", i: <Search className="w-5 h-5" />, d: "Fast video intros to gauge communication & fit." },
-                      { t: "DeepDive™", i: <FileText className="w-5 h-5" />, d: "Structured interviews for deeper capability." },
-                      { t: "Complete Pack™", i: <Sparkles className="w-5 h-5" />, d: "Both methods combined for critical roles." },
-                    ].map((c, i) => (
-                      <div key={i} className="rounded-xl border border-gray-200 p-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-lg bg-gray-100 text-[#0A2540] flex items-center justify-center">
-                            {c.i}
-                          </div>
-                          <div className="font-medium text-sm text-[#0A2540]">{c.t}</div>
-                        </div>
-                        <p className="text-sm text-[#505c6e] mt-2">{c.d}</p>
+            {/* Cards column */}
+            <div className="space-y-8">
+              {steps.map((s, idx) => (
+                <motion.article
+                  id={s.id}
+                  key={s.id}
+                  className="relative rounded-2xl border border-gray-100 bg-white/70 backdrop-blur-sm shadow-sm overflow-hidden scroll-mt-28"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-10% 0px -10% 0px" }}
+                  transition={{ duration: 0.5, delay: idx * 0.05 }}
+                  onViewportEnter={() => setActiveStep(s.id)}
+                >
+                  {/* accent bar */}
+                  <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-[#4F6BFF] via-[#4F6BFF]/60 to-transparent" />
+                  <div className="p-6 md:p-8">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-9 h-9 rounded-lg bg-[#4F6BFF]/10 text-[#4F6BFF] grid place-items-center">
+                        {s.icon}
                       </div>
-                    ))}
+                      <div className="text-sm text-[#4F6BFF]">{s.no}</div>
+                      <h4 className="text-xl md:text-2xl font-medium text-[#0A2540]">{s.title}</h4>
+                    </div>
+
+                    <p className="text-[#505c6e] leading-relaxed mb-6">{s.blurb}</p>
+
+                    <ul className="grid sm:grid-cols-2 gap-3">
+                      {s.bullets.map((b, i) => (
+                        <li key={i} className="flex items-start gap-2">
+                          <span className="mt-1 inline-block w-1.5 h-1.5 rounded-full bg-[#4F6BFF]" />
+                          <span className="text-sm text-[#505c6e]">{b}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+                </motion.article>
+              ))}
 
-        {/* Success fee (kept, no metrics) */}
-        <motion.div
-          className="mt-16 max-w-6xl mx-auto bg-[#4F6BFF0D] rounded-2xl p-6 border border-[#4F6BFF1A]"
-          initial={reduced ? { opacity: 0 } : { opacity: 0, y: 12 }}
-          whileInView={reduced ? { opacity: 1 } : { opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.35 }}
-        >
-          <div className="flex items-start gap-4">
-            <div className="bg-white rounded-lg p-2 text-[#4F6BFF] mt-1 border border-[#4F6BFF1A]">
-              <Check className="w-5 h-5" />
-            </div>
-            <div>
-              <h4 className="text-lg font-medium text-[#0A2540]">Success Fee Alignment</h4>
-              <p className="text-[#505c6e]">
-                Our incentives align with yours. Success fees reflect the selectivity and effort for higher-comp roles—and are paid only when you hire.
-              </p>
-              <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-                  <div className="text-sm text-[#505c6e]">0–60k roles</div>
-                  <div className="text-xl text-[#4F6BFF] font-light">$500 <span className="text-xs text-[#505c6e]">per hire</span></div>
-                </div>
-                <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-                  <div className="text-sm text-[#505c6e]">60k–120k roles</div>
-                  <div className="text-xl text-[#4F6BFF] font-light">$2,000 <span className="text-xs text-[#505c6e]">per hire</span></div>
-                </div>
-                <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
-                  <div className="text-sm text-[#505c6e]">120k–300k roles</div>
-                  <div className="text-xl text-[#4F6BFF] font-light">$6,000 <span className="text-xs text-[#505c6e]">per hire</span></div>
-                </div>
+              {/* Process CTA */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 rounded-2xl border border-[#4F6BFF]/20 bg-[#4F6BFF]/5 p-6">
+                <p className="text-sm text-[#505c6e]">
+                  Ready to run this process for your next role?
+                </p>
+                <motion.a
+                  href="/contact"
+                  className="inline-flex items-center gap-2 px-5 py-2 bg-[#4F6BFF] text-white text-sm font-medium rounded-md hover:bg-[#445fe6]"
+                  whileHover={{ x: 3 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  Start a conversation
+                  <ArrowRight className="w-4 h-4" />
+                </motion.a>
               </div>
             </div>
           </div>
-        </motion.div>
+        </section>
       </div>
     </section>
   );
