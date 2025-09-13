@@ -1,87 +1,235 @@
+// src/components/pricing/PricingHero.tsx
 import React, { useEffect, useRef, useState } from "react";
-import { motion, useScroll, useTransform, useSpring, AnimatePresence } from "framer-motion";
+import {
+  motion,
+  useScroll,
+  useTransform,
+  useSpring,
+  AnimatePresence,
+  useReducedMotion,
+  type Variants,
+} from "framer-motion";
 
-const PricingHero = () => {
-  const containerRef = useRef(null);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+const PricingHero: React.FC = () => {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const prefersReduced = useReducedMotion();
+
+  // --- Hydration guard to prevent "blink"
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  // Cursor follower (pointer-fine only)
   const [cursorHovering, setCursorHovering] = useState(false);
-
-  const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start start", "end start"] });
-  const backgroundY = useTransform(scrollYProgress, [0, 1], [0, 100]);
-  const backgroundScale = useTransform(scrollYProgress, [0, 1], [1, 1.15]);
-  const contentOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [pointerFine, setPointerFine] = useState(false);
 
   useEffect(() => {
-    const onMove = (e: MouseEvent) => setMousePosition({ x: e.clientX, y: e.clientY });
+    if (typeof window !== "undefined") {
+      setPointerFine(window.matchMedia?.("(pointer: fine)")?.matches ?? false);
+    }
+  }, []);
+  useEffect(() => {
+    if (!pointerFine) return;
+    const onMove = (e: MouseEvent) =>
+      setMousePosition({ x: e.clientX, y: e.clientY });
     window.addEventListener("mousemove", onMove);
     return () => window.removeEventListener("mousemove", onMove);
-  }, []);
+  }, [pointerFine]);
+
   const cursorX = useSpring(mousePosition.x, { damping: 30, stiffness: 150 });
   const cursorY = useSpring(mousePosition.y, { damping: 30, stiffness: 150 });
 
-  const [wavePaused, setWavePaused] = useState(false);
+  // Subtle parallax
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"],
+  });
+  const backgroundY = useTransform(scrollYProgress, [0, 1], [0, 50]);
+  const backgroundScale = useTransform(scrollYProgress, [0, 1], [1, 1.06]);
+  const contentY = useTransform(scrollYProgress, [0, 0.55], [0, 18]);
+  const contentOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0.06]);
+
+  // Typed easing tuple (avoids TS errors)
+  const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
+  const fadeUp: Variants = {
+    hidden: { opacity: 0, y: 14 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: EASE_OUT } },
+  };
 
   return (
     <section
       ref={containerRef}
-      className="relative min-h-[110vh] w-full overflow-hidden bg-white"
+      className="relative min-h-[100svh] w-full overflow-hidden bg-white pt-[calc(theme(spacing.24)+env(safe-area-inset-top))]"
       onMouseEnter={() => setCursorHovering(true)}
       onMouseLeave={() => setCursorHovering(false)}
     >
+      {/* Custom cursor */}
       <AnimatePresence>
-        {cursorHovering && (
-          <motion.div className="fixed top-0 left-0 z-50 pointer-events-none mix-blend-difference" initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0 }}
-            style={{ x: cursorX, y: cursorY, translateX: "-50%", translateY: "-50%" }}>
-            <div className="w-5 h-5 rounded-full bg-white backdrop-invert" />
+        {pointerFine && cursorHovering && (
+          <motion.div
+            className="fixed top-0 left-0 z-50 pointer-events-none mix-blend-difference"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.25 }}
+            style={{
+              x: cursorX,
+              y: cursorY,
+              translateX: "-50%",
+              translateY: "-50%",
+            }}
+          >
+            <div className="w-4 h-4 rounded-full bg-white/90 backdrop-invert" />
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Background */}
-      <div className="absolute inset-0 overflow-hidden">
-        <motion.div className="absolute inset-0 bg-gradient-to-b from-[#f5f8ff] to-white" style={{ y: backgroundY, scale: backgroundScale }} />
-        <div className="absolute inset-0 opacity-[0.07]">
-          <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 1440 800" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <motion.path
-              d="M-114,800L-114,291.8C-38,250.7,38,209.5,114,203.2C190,196.8,266,225.3,342,225.3C418,225.3,494,196.8,570,196.2C646,195.5,722,222.7,798,237.3C874,252,950,254.2,1026,248.3C1102,242.5,1178,228.7,1254,222.7C1330,216.7,1406,218.5,1482,222.2C1558,225.8,1634,231.3,1710,235.7C1786,240,1862,243.2,1938,235.7C2014,228.2,2090,210,2166,210.2C2242,210.3,2318,228.8,2394,240.8C2470,252.8,2546,258.3,2622,246C2698,233.7,2774,203.5,2850,208.2C2926,212.8,3002,252.3,3078,268.8C3154,285.3,3230,278.8,3306,276.8C3382,274.8,3458,277.3,3534,277.3C3610,277.3,3686,274.8,3724,273.5L3762,272.2L3762,800L3724,800C3686,800,3610,800,3534,800C3458,800,3382,800,3306,800C3230,800,3154,800,3078,800C3002,800,2926,800,2850,800C2774,800,2698,800,2622,800C2546,800,2470,800,2394,800C2318,800,2242,800,2166,800C2090,800,2014,800,1938,800C1862,800,1786,800,1710,800C1634,800,1558,800,1482,800C1406,800,1330,800,1254,800C1178,800,1102,800,1026,800C950,800,874,800,798,800C722,800,646,800,570,800C494,800,418,800,342,800C266,800,190,800,114,800C38,800,-38,800,-76,800L-114,800Z"
-              fill="#4F6BFF"
-              animate={{ opacity: 1 }}
-            />
-          </svg>
-        </div>
-        <div className="absolute inset-0 opacity-[0.03]" style={{
-          backgroundImage:
-            "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E\")",
-        }} />
+      {/* Background (subtle gradient + accents) */}
+      <div className="absolute inset-0 overflow-hidden will-change-transform z-0" aria-hidden>
+        <motion.div
+          className="absolute inset-0 transform-gpu"
+          style={{
+            // Gate animated values until mounted to avoid SSR/client mismatch
+            y: mounted && !prefersReduced ? backgroundY : 0,
+            scale: mounted && !prefersReduced ? backgroundScale : 1,
+            background:
+              "linear-gradient(180deg, #FFFFFF 0%, #F8FAFF 45%, #F4F7FF 100%)",
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              "radial-gradient(540px 360px at 86% 20%, rgba(79,107,255,0.10) 0%, rgba(79,107,255,0) 62%)," +
+              "radial-gradient(460px 320px at 18% 72%, rgba(109,134,255,0.08) 0%, rgba(109,134,255,0) 60%)",
+          }}
+        />
+        <div
+          className="absolute inset-0 opacity-[0.035]"
+          style={{
+            backgroundImage:
+              "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+          }}
+        />
       </div>
 
       {/* Floaters */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div className="absolute top-[15%] right-[10%] w-64 h-64 rounded-full border border-[#4F6BFF]/10" animate={{ y: [0, -20, 0], rotate: [0, 5, 0], scale: [1, 1.05, 1] }} transition={{ duration: 15, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }} />
-        <motion.div className="absolute bottom-[25%] left-[15%] w-40 h-40 border border-[#4F6BFF]/10 rounded-xl" animate={{ y: [0, 15, 0], rotate: [0, -3, 0], scale: [1, 1.03, 1] }} transition={{ duration: 12, repeat: Infinity, repeatType: "reverse", ease: "easeInOut", delay: 2 }} />
+      <div className="absolute inset-0 pointer-events-none z-[1]" aria-hidden>
+        {/* Circle */}
+        <motion.svg
+          className="absolute top-[14%] right-[10%] w-60 h-60"
+          viewBox="0 0 240 240"
+          fill="none"
+          animate={
+            prefersReduced ? undefined : { y: [0, -14, 0], rotate: [0, 6, 0], scale: [1, 1.03, 1] }
+          }
+          transition={{ duration: 15, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
+          style={{ filter: "drop-shadow(0 6px 28px rgba(79,107,255,0.18))" }}
+        >
+          <circle cx="120" cy="120" r="104" stroke="rgba(79,107,255,0.22)" strokeWidth="2.5" />
+          <circle cx="120" cy="120" r="104" fill="url(#circleGlassPricing)" />
+          <defs>
+            <linearGradient id="circleGlassPricing" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="rgba(255,255,255,0.06)" />
+              <stop offset="100%" stopColor="rgba(255,255,255,0.02)" />
+            </linearGradient>
+          </defs>
+        </motion.svg>
+
+        {/* Rounded rectangle */}
+        <motion.svg
+          className="absolute bottom-[22%] left-[14%] w-56 h-56"
+          viewBox="0 0 220 220"
+          fill="none"
+          animate={
+            prefersReduced ? undefined : { y: [0, 10, 0], rotate: [0, -4, 0], scale: [1, 1.02, 1] }
+          }
+          transition={{ duration: 12, repeat: Infinity, repeatType: "reverse", ease: "easeInOut", delay: 0.8 }}
+          style={{ filter: "drop-shadow(0 6px 24px rgba(79,107,255,0.16))" }}
+        >
+          <rect
+            x="10"
+            y="10"
+            width="200"
+            height="200"
+            rx="24"
+            stroke="rgba(79,107,255,0.18)"
+            strokeWidth="2.5"
+            fill="url(#rectGlassPricing)"
+          />
+          <defs>
+            <linearGradient id="rectGlassPricing" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="rgba(255,255,255,0.05)" />
+              <stop offset="100%" stopColor="rgba(255,255,255,0.02)" />
+            </linearGradient>
+          </defs>
+        </motion.svg>
       </div>
 
       {/* Content */}
-      <div className="relative h-screen flex flex-col justify-center items-center">
-        <motion.div className="container mx-auto px-4 text-center" style={{ opacity: contentOpacity }}>
-          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1 }} className="max-w-4xl mx-auto">
-            <h1 className="text-[clamp(3rem,8vw,6.5rem)] leading-[1.1] font-display tracking-[-0.03em] text-[#0A2540]">
+      <div className="relative grid place-items-center min-h-[60vh] z-10">
+        <motion.div
+          className="container mx-auto px-6 text-center"
+          // Gate transform/opacity until mounted
+          style={{
+            y: mounted && !prefersReduced ? contentY : 0,
+            opacity: mounted ? contentOpacity : 1,
+          }}
+        >
+          <motion.div
+            className="max-w-4xl mx-auto"
+            variants={fadeUp}
+            // Disable SSR "hidden" to prevent mismatch, enable after mount
+            initial={mounted ? "hidden" : false}
+            animate={mounted ? "show" : undefined}
+            viewport={{ once: true, amount: 0.6 }}
+          >
+            <h1 className="text-[clamp(2.6rem,6.2vw,4.9rem)] leading-[1.08] font-display tracking-[-0.025em] text-[#0A2540]">
               <span className="font-light block">Transparent,</span>
-              <motion.span className="bg-clip-text text-transparent bg-gradient-to-r from-[#4F6BFF] to-[#4F6BFF]/80 font-normal inline-block relative">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#4F6BFF] via-[#6D86FF] to-[#4F6BFF]/80 font-semibold inline-block">
                 value-based pricing
-              </motion.span>
+              </span>
             </h1>
-            <motion.p className="mt-8 text-xl md:text-2xl text-[#505c6e] max-w-2xl mx-auto leading-relaxed" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 0.2 }}>
+            <motion.p
+              className="mt-6 text-lg md:text-xl text-[#505c6e] max-w-2xl mx-auto leading-relaxed"
+              variants={fadeUp}
+              transition={{ delay: 0.05 }}
+            >
               Scales with role complexity so incentives stay aligned.
             </motion.p>
           </motion.div>
 
-          <motion.div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 0.4 }}>
-            <motion.a href="/pricing#plans" className="group relative overflow-hidden rounded-full bg-[#4F6BFF] px-8 py-4 text-white shadow-lg" whileHover={{ y: -4 }} transition={{ duration: 0.2 }}>
-              <span className="relative z-10 text-base font-medium tracking-wide">View plans</span>
-              <motion.span className="absolute inset-0 bg-gradient-to-r from-[#4F6BFF] to-[#4F6BFF]/80" initial={{ x: "100%" }} whileHover={{ x: 0 }} transition={{ duration: 0.4 }} />
+          <motion.div
+            className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-6"
+            variants={fadeUp}
+            initial={mounted ? "hidden" : false}
+            animate={mounted ? "show" : undefined}
+            viewport={{ once: true, amount: 0.6 }}
+            transition={{ delay: 0.1 }}
+          >
+            <motion.a
+              href="/pricing#plans"
+              className="group relative overflow-hidden rounded-full bg-[#4F6BFF] px-8 py-4 text-white shadow-lg hover:-translate-y-[3px] transition-transform
+                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#4F6BFF]"
+              whileHover={{ y: -3 }}
+              transition={{ duration: 0.2 }}
+            >
+              <span className="relative z-10 text-base font-medium tracking-wide">
+                View plans
+              </span>
+              <motion.span
+                className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#6D86FF] to-[#4F6BFF]/90 opacity-0 group-hover:opacity-100 transition-opacity"
+              />
             </motion.a>
-            <motion.a href="/contact" className="group relative rounded-full border border-[#E5E7EB] px-8 py-4 text-[#0A2540] hover:border-[#4F6BFF]/30 transition-colors" whileHover={{ y: -4 }} transition={{ duration: 0.2 }}>
+
+            <motion.a
+              href="/contact#contact-form"
+              className="group relative rounded-full border border-[#E5E7EB] px-8 py-4 text-[#0A2540]
+                         hover:border-[#4F6BFF]/30 hover:bg-white transition-colors
+                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#4F6BFF]/40"
+              whileHover={{ y: -3 }}
+              transition={{ duration: 0.2 }}
+            >
               <span className="text-base font-medium tracking-wide">Talk to sales</span>
             </motion.a>
           </motion.div>
