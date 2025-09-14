@@ -1,5 +1,5 @@
 // src/components/pricing/PricingHero.tsx
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, memo } from "react";
 import {
   motion,
   useScroll,
@@ -14,7 +14,7 @@ const PricingHero: React.FC = () => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const prefersReduced = useReducedMotion();
 
-  // --- Hydration guard to prevent "blink"
+  // Hydration guard to prevent SSR → CSR mismatch flicker
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
@@ -30,31 +30,28 @@ const PricingHero: React.FC = () => {
   }, []);
   useEffect(() => {
     if (!pointerFine) return;
-    const onMove = (e: MouseEvent) =>
-      setMousePosition({ x: e.clientX, y: e.clientY });
+    const onMove = (e: MouseEvent) => setMousePosition({ x: e.clientX, y: e.clientY });
     window.addEventListener("mousemove", onMove);
     return () => window.removeEventListener("mousemove", onMove);
   }, [pointerFine]);
 
-  const cursorX = useSpring(mousePosition.x, { damping: 30, stiffness: 150 });
-  const cursorY = useSpring(mousePosition.y, { damping: 30, stiffness: 150 });
+  const cursorX = useSpring(mousePosition.x, { damping: 28, stiffness: 240, mass: 0.5 });
+  const cursorY = useSpring(mousePosition.y, { damping: 28, stiffness: 240, mass: 0.5 });
 
-  // Subtle parallax
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end start"],
-  });
-  const backgroundY = useTransform(scrollYProgress, [0, 1], [0, 50]);
-  const backgroundScale = useTransform(scrollYProgress, [0, 1], [1, 1.06]);
-  const contentY = useTransform(scrollYProgress, [0, 0.55], [0, 18]);
-  const contentOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0.06]);
+  // Parallax
+  const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start start", "end start"] });
+  const backgroundY = useTransform(scrollYProgress, [0, 1], [0, 40]);
+  const backgroundScale = useTransform(scrollYProgress, [0, 1], [1, 1.05]);
+  const contentY = useTransform(scrollYProgress, [0, 0.55], [0, 16]);
+  const contentOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0.1]);
 
-  // Typed easing tuple (avoids TS errors)
   const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
   const fadeUp: Variants = {
     hidden: { opacity: 0, y: 14 },
     show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: EASE_OUT } },
   };
+
+  const spring = { type: "spring", stiffness: 260, damping: 30, mass: 0.6 } as const;
 
   return (
     <section
@@ -63,21 +60,16 @@ const PricingHero: React.FC = () => {
       onMouseEnter={() => setCursorHovering(true)}
       onMouseLeave={() => setCursorHovering(false)}
     >
-      {/* Custom cursor */}
-      <AnimatePresence>
+      {/* Custom cursor (kept subtle, no remount flicker) */}
+      <AnimatePresence initial={false}>
         {pointerFine && cursorHovering && (
           <motion.div
             className="fixed top-0 left-0 z-50 pointer-events-none mix-blend-difference"
-            initial={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, scale: 0.92 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.25 }}
-            style={{
-              x: cursorX,
-              y: cursorY,
-              translateX: "-50%",
-              translateY: "-50%",
-            }}
+            exit={{ opacity: 0, scale: 0.92 }}
+            transition={{ duration: 0.18 }}
+            style={{ x: cursorX, y: cursorY, translateX: "-50%", translateY: "-50%" }}
           >
             <div className="w-4 h-4 rounded-full bg-white/90 backdrop-invert" />
           </motion.div>
@@ -89,12 +81,12 @@ const PricingHero: React.FC = () => {
         <motion.div
           className="absolute inset-0 transform-gpu"
           style={{
-            // Gate animated values until mounted to avoid SSR/client mismatch
             y: mounted && !prefersReduced ? backgroundY : 0,
             scale: mounted && !prefersReduced ? backgroundScale : 1,
-            background:
-              "linear-gradient(180deg, #FFFFFF 0%, #F8FAFF 45%, #F4F7FF 100%)",
+            background: "linear-gradient(180deg, #FFFFFF 0%, #F8FAFF 45%, #F4F7FF 100%)",
           }}
+          initial={false}
+          transition={spring}
         />
         <div
           className="absolute inset-0"
@@ -115,14 +107,11 @@ const PricingHero: React.FC = () => {
 
       {/* Floaters */}
       <div className="absolute inset-0 pointer-events-none z-[1]" aria-hidden>
-        {/* Circle */}
         <motion.svg
           className="absolute top-[14%] right-[10%] w-60 h-60"
           viewBox="0 0 240 240"
           fill="none"
-          animate={
-            prefersReduced ? undefined : { y: [0, -14, 0], rotate: [0, 6, 0], scale: [1, 1.03, 1] }
-          }
+          animate={prefersReduced ? undefined : { y: [0, -14, 0], rotate: [0, 6, 0], scale: [1, 1.03, 1] }}
           transition={{ duration: 15, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
           style={{ filter: "drop-shadow(0 6px 28px rgba(79,107,255,0.18))" }}
         >
@@ -136,27 +125,15 @@ const PricingHero: React.FC = () => {
           </defs>
         </motion.svg>
 
-        {/* Rounded rectangle */}
         <motion.svg
           className="absolute bottom-[22%] left-[14%] w-56 h-56"
           viewBox="0 0 220 220"
           fill="none"
-          animate={
-            prefersReduced ? undefined : { y: [0, 10, 0], rotate: [0, -4, 0], scale: [1, 1.02, 1] }
-          }
+          animate={prefersReduced ? undefined : { y: [0, 10, 0], rotate: [0, -4, 0], scale: [1, 1.02, 1] }}
           transition={{ duration: 12, repeat: Infinity, repeatType: "reverse", ease: "easeInOut", delay: 0.8 }}
           style={{ filter: "drop-shadow(0 6px 24px rgba(79,107,255,0.16))" }}
         >
-          <rect
-            x="10"
-            y="10"
-            width="200"
-            height="200"
-            rx="24"
-            stroke="rgba(79,107,255,0.18)"
-            strokeWidth="2.5"
-            fill="url(#rectGlassPricing)"
-          />
+          <rect x="10" y="10" width="200" height="200" rx="24" stroke="rgba(79,107,255,0.18)" strokeWidth="2.5" fill="url(#rectGlassPricing)" />
           <defs>
             <linearGradient id="rectGlassPricing" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0%" stopColor="rgba(255,255,255,0.05)" />
@@ -169,31 +146,26 @@ const PricingHero: React.FC = () => {
       {/* Content */}
       <div className="relative grid place-items-center min-h-[60vh] z-10">
         <motion.div
-          className="container mx-auto px-6 text-center"
-          // Gate transform/opacity until mounted
-          style={{
-            y: mounted && !prefersReduced ? contentY : 0,
-            opacity: mounted ? contentOpacity : 1,
-          }}
+          className="container mx-auto px-6 text-center will-change-transform"
+          style={{ y: mounted && !prefersReduced ? contentY : 0, opacity: mounted ? contentOpacity : 1 }}
+          initial={false}
+          transition={spring}
         >
           <motion.div
             className="max-w-4xl mx-auto"
             variants={fadeUp}
-            // Disable SSR "hidden" to prevent mismatch, enable after mount
-            initial={mounted ? "hidden" : false}
-            animate={mounted ? "show" : undefined}
+            initial={false}
+            whileInView="show"
             viewport={{ once: true, amount: 0.6 }}
           >
             <h1 className="text-[clamp(2.6rem,6.2vw,4.9rem)] leading-[1.08] font-display tracking-[-0.025em] text-[#0A2540]">
               <span className="font-light block">Transparent,</span>
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#4F6BFF] via-[#6D86FF] to-[#4F6BFF]/80 font-semibold inline-block">
-                value-based pricing
-              </span>
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#4F6BFF] via-[#6D86FF] to-[#4F6BFF]/80 font-semibold inline-block">value-based pricing</span>
             </h1>
             <motion.p
               className="mt-6 text-lg md:text-xl text-[#505c6e] max-w-2xl mx-auto leading-relaxed"
               variants={fadeUp}
-              transition={{ delay: 0.05 }}
+              transition={{ delay: 0.05, ease: EASE_OUT }}
             >
               Scales with role complexity so incentives stay aligned.
             </motion.p>
@@ -202,24 +174,20 @@ const PricingHero: React.FC = () => {
           <motion.div
             className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-6"
             variants={fadeUp}
-            initial={mounted ? "hidden" : false}
-            animate={mounted ? "show" : undefined}
+            initial={false}
+            whileInView="show"
             viewport={{ once: true, amount: 0.6 }}
-            transition={{ delay: 0.1 }}
+            transition={{ delay: 0.1, ease: EASE_OUT }}
           >
             <motion.a
               href="/pricing#plans"
-              className="group relative overflow-hidden rounded-full bg-[#4F6BFF] px-8 py-4 text-white shadow-lg hover:-translate-y-[3px] transition-transform
+              className="group relative overflow-hidden rounded-full bg-[#4F6BFF] px-8 py-4 text-white shadow-lg transition-transform will-change-transform
                          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#4F6BFF]"
               whileHover={{ y: -3 }}
               transition={{ duration: 0.2 }}
             >
-              <span className="relative z-10 text-base font-medium tracking-wide">
-                View plans
-              </span>
-              <motion.span
-                className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#6D86FF] to-[#4F6BFF]/90 opacity-0 group-hover:opacity-100 transition-opacity"
-              />
+              <span className="relative z-10 text-base font-medium tracking-wide">View plans</span>
+              <span className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#6D86FF] to-[#4F6BFF]/90 opacity-0 group-hover:opacity-100 transition-opacity" />
             </motion.a>
 
             <motion.a
@@ -239,4 +207,4 @@ const PricingHero: React.FC = () => {
   );
 };
 
-export default PricingHero;
+export default memo(PricingHero);
