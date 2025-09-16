@@ -1,22 +1,26 @@
-import React, { useState, useRef, useEffect } from "react";
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
-import { Play, Users, Layers, Handshake, ArrowRight, Check } from "lucide-react";
+'use client'
+
+import React, { useEffect, useRef, useState } from 'react';
+import { motion, useScroll, useTransform, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { Play, Users, Layers, Handshake, ArrowRight, Check } from 'lucide-react';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-const TailoredSolutions = () => {
-  const [activeSolution, setActiveSolution] = useState("snapshot");
-  const [mounted, setMounted] = useState(false); // ← prevents first-paint blink
+const TailoredSolutions: React.FC = () => {
+  const [activeSolution, setActiveSolution] = useState<'snapshot' | 'deepdive' | 'complete'>('snapshot');
+
+  // Hydration guard to prevent SSR→CSR blink
+  const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
-  const sectionRef = useRef(null);
+
+  const prefersReduced = useReducedMotion();
+
+  const sectionRef = useRef<HTMLElement | null>(null);
 
   // Scroll-based animations
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  });
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start end', 'end start'] });
 
-  // Parallax effects
+  // Derived transforms (declared once → no re-creation jitters)
   const titleOpacity = useTransform(scrollYProgress, [0.05, 0.15], [0, 1]);
   const titleY = useTransform(scrollYProgress, [0.05, 0.15], [30, 0]);
   const backgroundY = useTransform(scrollYProgress, [0, 1], [0, 50]);
@@ -24,101 +28,98 @@ const TailoredSolutions = () => {
   // Solutions data
   const solutions = [
     {
-      id: "snapshot",
-      title: "Talent Snapshot™",
-      description:
-        "Brief, focused candidate introductions that provide immediate insight into fit and capability.",
+      id: 'snapshot',
+      title: 'Talent Snapshot™',
+      description: 'Brief, focused candidate introductions that provide immediate insight into fit and capability.',
       details: [
-        "Pre-recorded video introductions from candidates",
-        "Custom screening questions tailored to your requirements",
-        "Efficient initial assessment of candidate fit",
-        "Immediate access via our secure client portal",
+        'Pre-recorded video introductions from candidates',
+        'Custom screening questions tailored to your requirements',
+        'Efficient initial assessment of candidate fit',
+        'Immediate access via our secure client portal',
       ],
       icon: <Play className="w-5 h-5" />,
-      color: "#4F6BFF",
+      color: '#4F6BFF',
       pricing: [
-        { level: "0-60k roles", price: "20 for $200 | 50 for $450 | 100 for $800" },
-        { level: "60k-120k roles", price: "Pricing doubles" },
-        { level: "120k-300k roles", price: "Pricing triples" },
+        { level: '0-60k roles', price: '20 for $200 | 50 for $450 | 100 for $800' },
+        { level: '60k-120k roles', price: 'Pricing doubles' },
+        { level: '120k-300k roles', price: 'Pricing triples' },
       ],
     },
     {
-      id: "deepdive",
-      title: "Talent DeepDive™",
-      description:
-        "Structured, in-depth conversations that reveal nuanced understanding of experience and expertise.",
+      id: 'deepdive',
+      title: 'Talent DeepDive™',
+      description: 'Structured, in-depth conversations that reveal nuanced understanding of experience and expertise.',
       details: [
-        "Recruiter-led structured interviews",
-        "Comprehensive assessment of skills and experience",
-        "Behavioral and situational questions",
-        "Detailed insights into candidate capabilities",
+        'Recruiter-led structured interviews',
+        'Comprehensive assessment of skills and experience',
+        'Behavioral and situational questions',
+        'Detailed insights into candidate capabilities',
       ],
       icon: <Users className="w-5 h-5" />,
-      color: "#6366f1",
+      color: '#6366f1',
       pricing: [
-        { level: "0-60k roles", price: "10 for $300 | 20 for $550 | 50 for $1,250" },
-        { level: "60k-120k roles", price: "Pricing doubles" },
-        { level: "120k-300k roles", price: "Pricing triples" },
+        { level: '0-60k roles', price: '10 for $300 | 20 for $550 | 50 for $1,250' },
+        { level: '60k-120k roles', price: 'Pricing doubles' },
+        { level: '120k-300k roles', price: 'Pricing triples' },
       ],
     },
     {
-      id: "complete",
-      title: "Complete Talent Pack™",
-      description:
-        "A comprehensive approach combining both methodologies for thorough talent discovery.",
+      id: 'complete',
+      title: 'Complete Talent Pack™',
+      description: 'A comprehensive approach combining both methodologies for thorough talent discovery.',
       details: [
-        "Combined Snapshot and DeepDive methodologies",
-        "Maximum candidate insights for critical roles",
-        "Comprehensive screening across all dimensions",
-        "Optimal approach for senior or complex positions",
+        'Combined Snapshot and DeepDive methodologies',
+        'Maximum candidate insights for critical roles',
+        'Comprehensive screening across all dimensions',
+        'Optimal approach for senior or complex positions',
       ],
       icon: <Layers className="w-5 h-5" />,
-      color: "#4F6BFF",
+      color: '#4F6BFF',
       pricing: [
-        { level: "0-60k roles", price: "Starter: $450 | Growth: $900 | Enterprise: $2,000" },
-        { level: "60k-120k roles", price: "Pricing doubles" },
-        { level: "120k-300k roles", price: "Pricing triples" },
+        { level: '0-60k roles', price: 'Starter: $450 | Growth: $900 | Enterprise: $2,000' },
+        { level: '60k-120k roles', price: 'Pricing doubles' },
+        { level: '120k-300k roles', price: 'Pricing triples' },
       ],
     },
-  ];
+  ] as const;
 
-  const activeSolutionData = solutions.find((s) => s.id === activeSolution) || solutions[0];
+  const activeSolutionData = solutions.find((s) => s.id === activeSolution) ?? solutions[0];
 
   // Helpers to avoid SSR flash: start visible on SSR, animate on client
-  const inViewInit = mounted ? { opacity: 0, y: 20 } : { opacity: 1, y: 0 };
-  const inViewInitSmall = mounted ? { opacity: 0, y: -10 } : { opacity: 1, y: 0 };
+  const inViewInit = mounted && !prefersReduced ? { opacity: 0, y: 20 } : false;
+  const inViewInitSmall = mounted && !prefersReduced ? { opacity: 0, y: -10 } : false;
+  const viewport = { once: true, amount: 0.3 } as const;
 
   return (
     <section ref={sectionRef} className="py-36 relative overflow-hidden bg-white">
-      {/* Background elements */}
+      {/* Background elements (GPU accelerated) */}
       <motion.div
-        className="absolute inset-0 bg-gradient-to-b from-white to-gray-50/30 pointer-events-none"
-        style={{ y: backgroundY }}
+        key={mounted ? 'bg-mounted' : 'bg-ssr'}
+        className="absolute inset-0 bg-gradient-to-b from-white to-gray-50/30 pointer-events-none transform-gpu will-change-transform"
+        style={{ y: backgroundY, backfaceVisibility: 'hidden' }}
+        initial={false}
+        animate={{}}
       />
 
       {/* Subtle pattern */}
       <div
-        className="absolute inset-0 opacity-[0.02]"
+        className="absolute inset-0 opacity-[0.02] select-none"
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-          backgroundSize: "200px",
+          backgroundImage:
+            "url('data:image/svg+xml,%3Csvg viewBox=\\'0 0 200 200\\' xmlns=\\'http://www.w3.org/2000/svg\\'%3E%3Cfilter id=\\'noiseFilter\\'%3E%3CfeTurbulence type=\\'fractalNoise\\' baseFrequency=\\'0.7\\' numOctaves=\\'2\\' stitchTiles=\\'stitch\\'/%3E%3C/filter%3E%3Crect width=\\'100%25\\' height=\\'100%25\\' filter=\\'url(%23noiseFilter)\\'/%3E%3C/svg%3E')",
+          backgroundSize: '200px',
         }}
+        aria-hidden
       />
 
       <div className="container mx-auto px-6 relative z-10">
         {/* Header section */}
-        <motion.div
-          className="max-w-3xl mx-auto text-center mb-24"
-          style={{
-            opacity: titleOpacity,
-            y: titleY,
-          }}
-        >
+        <motion.div className="max-w-3xl mx-auto text-center mb-24" style={{ opacity: titleOpacity, y: titleY }}>
           <motion.span
             className="inline-block py-1.5 px-4 bg-ph/10 text-ph font-medium rounded-full text-sm mb-6"
             initial={inViewInitSmall}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.4 }}
+            viewport={viewport}
             transition={{ duration: 0.5, ease: EASE }}
           >
             Our Offerings
@@ -128,7 +129,7 @@ const TailoredSolutions = () => {
             className="text-4xl md:text-5xl font-display font-light tracking-tight text-foreground mb-6"
             initial={inViewInit}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.4 }}
+            viewport={viewport}
             transition={{ duration: 0.6, ease: EASE }}
           >
             Tailored Solutions
@@ -138,7 +139,7 @@ const TailoredSolutions = () => {
             className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed"
             initial={inViewInit}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.4 }}
+            viewport={viewport}
             transition={{ duration: 0.6, ease: EASE, delay: 0.05 }}
           >
             Discover our thoughtfully designed approaches to talent identification
@@ -157,49 +158,38 @@ const TailoredSolutions = () => {
                   key={solution.id}
                   className={`relative p-5 rounded-xl transition-all duration-300 cursor-pointer ${
                     activeSolution === solution.id
-                      ? "shadow-sm glass-card border border-white/20"
-                      : "bg-white/80 hover:bg-white/90 border border-transparent"
+                      ? 'shadow-sm glass-card border border-white/20'
+                      : 'bg-white/80 hover:bg-white/90 border border-transparent'
                   }`}
                   onClick={() => setActiveSolution(solution.id)}
-                  whileHover={{ x: 5 }}
+                  whileHover={prefersReduced ? {} : { x: 5 }}
                   transition={{ duration: 0.25, ease: EASE }}
-                  initial={mounted ? { opacity: 0, y: 10 } : { opacity: 1, y: 0 }}
+                  initial={inViewInitSmall}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.2 }}
+                  viewport={viewport}
                 >
                   <div className="flex items-center gap-4">
                     <div
                       className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-colors duration-300 ${
-                        activeSolution === solution.id ? `bg-ph/10 text-ph` : `bg-gray-50 text-muted-foreground`
+                        activeSolution === solution.id ? 'bg-ph/10 text-ph' : 'bg-gray-50 text-muted-foreground'
                       }`}
                     >
                       {solution.icon}
                     </div>
 
                     <div className="flex-1">
-                      <h4
-                        className={`font-medium transition-colors duration-300 ${
-                          activeSolution === solution.id ? "text-ph" : "text-foreground"
-                        }`}
-                      >
+                      <h4 className={`font-medium transition-colors duration-300 ${activeSolution === solution.id ? 'text-ph' : 'text-foreground'}`}>
                         {solution.title}
                       </h4>
 
-                      <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                        {solution.description}
-                      </p>
+                      <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{solution.description}</p>
                     </div>
 
                     <motion.div
-                      animate={{
-                        x: activeSolution === solution.id ? 5 : 0,
-                        opacity: activeSolution === solution.id ? 1 : 0.5,
-                      }}
+                      animate={{ x: activeSolution === solution.id ? 5 : 0, opacity: activeSolution === solution.id ? 1 : 0.5 }}
                       transition={{ duration: 0.25, ease: EASE }}
                     >
-                      <ArrowRight
-                        className={`w-4 h-4 ${activeSolution === solution.id ? "text-ph" : "text-muted-foreground"}`}
-                      />
+                      <ArrowRight className={`w-4 h-4 ${activeSolution === solution.id ? 'text-ph' : 'text-muted-foreground'}`} />
                     </motion.div>
                   </div>
                 </motion.div>
@@ -210,19 +200,12 @@ const TailoredSolutions = () => {
               className="mt-8 p-6 rounded-xl glass-card"
               initial={inViewInit}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
+              viewport={viewport}
               transition={{ delay: 0.1, duration: 0.5, ease: EASE }}
             >
               <h4 className="font-medium text-foreground mb-3">Not Sure Which to Choose?</h4>
-              <p className="text-sm text-muted-foreground mb-4">
-                Our team can help you determine the ideal solution based on your specific recruiting needs.
-              </p>
-              <motion.a
-                href="/contact"
-                className="inline-flex items-center button-secondary text-sm"
-                whileHover={{ x: 5 }}
-                transition={{ duration: 0.2, ease: EASE }}
-              >
+              <p className="text-sm text-muted-foreground mb-4">Our team can help you determine the ideal solution based on your specific recruiting needs.</p>
+              <motion.a href="/contact" className="inline-flex items-center button-secondary text-sm" whileHover={prefersReduced ? {} : { x: 5 }} transition={{ duration: 0.2, ease: EASE }}>
                 Schedule a consultation
                 <ArrowRight className="ml-2 w-3 h-3" />
               </motion.a>
@@ -233,22 +216,12 @@ const TailoredSolutions = () => {
           <div className="lg:col-span-8 h-full">
             <AnimatePresence mode="wait" initial={false}>
               {/* initial={false} prevents first-mount blink */}
-              <motion.div
-                key={activeSolution}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -12 }}
-                transition={{ duration: 0.45, ease: EASE }}
-                className="h-full"
-              >
+              <motion.div key={activeSolution} initial={mounted && !prefersReduced ? { opacity: 0, y: 12 } : false} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: prefersReduced ? 0 : 0.45, ease: EASE }} className="h-full">
                 <div className="rounded-xl glass-card h-full overflow-hidden">
                   {/* Header */}
                   <div className="px-8 py-6 border-b border-white/20 bg-gradient-to-r from-ph/5 to-transparent">
                     <div className="flex items-center gap-4">
-                      <div
-                        className="w-12 h-12 rounded-xl flex items-center justify-center bg-white shadow-sm"
-                        style={{ color: activeSolutionData.color }}
-                      >
+                      <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-white shadow-sm" style={{ color: activeSolutionData.color }}>
                         {activeSolutionData.icon}
                       </div>
 
@@ -267,13 +240,7 @@ const TailoredSolutions = () => {
                         <h4 className="text-base font-medium text-foreground mb-5">Key Features</h4>
                         <ul className="space-y-4">
                           {activeSolutionData.details.map((detail, index) => (
-                            <motion.li
-                              key={index}
-                              className="flex items-start gap-3"
-                              initial={{ opacity: 0, x: -12 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ delay: 0.12 + index * 0.08, duration: 0.4, ease: EASE }}
-                            >
+                            <motion.li key={detail} className="flex items-start gap-3" initial={mounted && !prefersReduced ? { opacity: 0, x: -12 } : false} animate={{ opacity: 1, x: 0 }} transition={{ delay: prefersReduced ? 0 : 0.12 + index * 0.08, duration: prefersReduced ? 0 : 0.4, ease: EASE }}>
                               <div className="w-5 h-5 rounded-full flex items-center justify-center text-white bg-ph mt-0.5 shrink-0">
                                 <Check className="w-3 h-3" />
                               </div>
@@ -283,12 +250,7 @@ const TailoredSolutions = () => {
                         </ul>
 
                         <div className="mt-8">
-                          <motion.a
-                            href={`/solutions/${activeSolutionData.id}`}
-                            className="button-secondary inline-flex items-center text-sm"
-                            whileHover={{ x: 5 }}
-                            transition={{ duration: 0.2, ease: EASE }}
-                          >
+                          <motion.a href={`/solutions/${activeSolutionData.id}`} className="button-secondary inline-flex items-center text-sm" whileHover={prefersReduced ? {} : { x: 5 }} transition={{ duration: 0.2, ease: EASE }}>
                             Learn more about {activeSolutionData.title}
                             <ArrowRight className="ml-2 w-4 h-4" />
                           </motion.a>
@@ -301,33 +263,19 @@ const TailoredSolutions = () => {
 
                         <div className="space-y-4">
                           {activeSolutionData.pricing.map((tier, index) => (
-                            <motion.div
-                              key={index}
-                              className="rounded-lg glass-card p-4"
-                              initial={{ opacity: 0, y: 12 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: 0.18 + index * 0.08, duration: 0.4, ease: EASE }}
-                              whileHover={{ y: -3 }}
-                            >
-                              <div className="text-sm font-medium pb-2 mb-2 border-b border-white/10 text-foreground">
-                                {tier.level}
-                              </div>
+                            <motion.div key={`${activeSolutionData.id}-${tier.level}`} className="rounded-lg glass-card p-4" initial={mounted && !prefersReduced ? { opacity: 0, y: 12 } : false} animate={{ opacity: 1, y: 0 }} transition={{ delay: prefersReduced ? 0 : 0.18 + index * 0.08, duration: prefersReduced ? 0 : 0.4, ease: EASE }} whileHover={prefersReduced ? {} : { y: -3 }}>
+                              <div className="text-sm font-medium pb-2 mb-2 border-b border-white/10 text-foreground">{tier.level}</div>
                               <div className="text-muted-foreground text-sm">{tier.price}</div>
                             </motion.div>
                           ))}
                         </div>
 
-                        <motion.div
-                          className="mt-6 text-xs text-muted-foreground bg-ph/5 p-3 rounded-lg"
-                          initial={{ opacity: 0, y: 8 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.4, duration: 0.35, ease: EASE }}
-                        >
+                        <motion.div className="mt-6 text-xs text-muted-foreground bg-ph/5 p-3 rounded-lg" initial={mounted && !prefersReduced ? { opacity: 0, y: 8 } : false} animate={{ opacity: 1, y: 0 }} transition={{ delay: prefersReduced ? 0 : 0.4, duration: prefersReduced ? 0 : 0.35, ease: EASE }}>
                           <p>
-                            Success fee applies per hire. View our{" "}
+                            Success fee applies per hire. View our{' '}
                             <a href="/pricing" className="text-ph hover:underline">
                               complete pricing details
-                            </a>{" "}
+                            </a>{' '}
                             for more information.
                           </p>
                         </motion.div>
@@ -341,18 +289,10 @@ const TailoredSolutions = () => {
         </div>
 
         {/* Salary-based pricing section */}
-        <motion.div
-          className="max-w-5xl mx-auto"
-          initial={inViewInit}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ delay: 0.15, duration: 0.6, ease: EASE }}
-        >
+        <motion.div className="max-w-5xl mx-auto" initial={inViewInit} whileInView={{ opacity: 1, y: 0 }} viewport={viewport} transition={{ delay: prefersReduced ? 0 : 0.15, duration: prefersReduced ? 0 : 0.6, ease: EASE }}>
           <div className="rounded-2xl overflow-hidden glass-card border border-white/20">
             <div className="px-8 py-10 bg-gradient-to-r from-ph/10 to-transparent border-b border-white/10">
-              <h3 className="text-2xl font-display font-light text-foreground mb-3">
-                Transparent Value-Based Pricing
-              </h3>
+              <h3 className="text-2xl font-display font-light text-foreground mb-3">Transparent Value-Based Pricing</h3>
               <p className="text-muted-foreground max-w-3xl">
                 Our pricing scales appropriately with role compensation, reflecting the effort required to
                 source exceptional candidates at each level.
@@ -361,39 +301,13 @@ const TailoredSolutions = () => {
 
             <div className="bg-white/50 backdrop-blur-sm p-8">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <PricingTier
-                  title="Entry Level"
-                  range="0-60k"
-                  highlight={false}
-                  successFee="$500"
-                  description="Standard pricing for entry-level positions"
-                />
-
-                <PricingTier
-                  title="Mid-Level"
-                  range="60k-120k"
-                  highlight={true}
-                  successFee="$2,000"
-                  description="Pricing doubles for mid-level roles"
-                />
-
-                <PricingTier
-                  title="Senior Level"
-                  range="120k-300k"
-                  highlight={false}
-                  successFee="$6,000"
-                  description="Pricing triples for senior positions"
-                />
+                <PricingTier title="Entry Level" range="0-60k" highlight={false} successFee="$500" description="Standard pricing for entry-level positions" />
+                <PricingTier title="Mid-Level" range="60k-120k" highlight successFee="$2,000" description="Pricing doubles for mid-level roles" />
+                <PricingTier title="Senior Level" range="120k-300k" highlight={false} successFee="$6,000" description="Pricing triples for senior positions" />
               </div>
 
               {/* Success fee explanation */}
-              <motion.div
-                className="mt-10 bg-ph/5 rounded-xl p-6 border border-ph/10"
-                initial={inViewInit}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{ delay: 0.25, duration: 0.5, ease: EASE }}
-              >
+              <motion.div className="mt-10 bg-ph/5 rounded-xl p-6 border border-ph/10" initial={inViewInit} whileInView={{ opacity: 1, y: 0 }} viewport={viewport} transition={{ delay: prefersReduced ? 0 : 0.25, duration: prefersReduced ? 0 : 0.5, ease: EASE }}>
                 <div className="flex items-start gap-4">
                   <div className="bg-white rounded-lg p-2 text-ph mt-1">
                     <Handshake className="w-5 h-5" />
@@ -401,22 +315,14 @@ const TailoredSolutions = () => {
                   <div>
                     <h4 className="text-lg font-medium text-foreground mb-2">Success Fee Alignment</h4>
                     <p className="text-muted-foreground">
-                      Our success fees ensure our incentives are directly aligned with your successful
-                      placements while reflecting the greater selectivity and effort required for
-                      higher-compensation candidates. You only pay this fee when you've found your ideal match.
+                      Our success fees ensure our incentives are directly aligned with your successful placements while reflecting the greater selectivity and effort required for higher-compensation candidates. You only pay this fee when you've found your ideal match.
                     </p>
                   </div>
                 </div>
               </motion.div>
 
               <div className="text-center mt-10">
-                <motion.a
-                  href="/pricing"
-                  className="button-primary inline-block"
-                  whileHover={{ y: -3 }}
-                  whileTap={{ y: 0 }}
-                  transition={{ duration: 0.2, ease: EASE }}
-                >
+                <motion.a href="/pricing" className="button-primary inline-block" whileHover={prefersReduced ? {} : { y: -3 }} whileTap={{ y: 0 }} transition={{ duration: 0.2, ease: EASE }}>
                   View Complete Pricing Details
                 </motion.a>
               </div>
@@ -429,31 +335,24 @@ const TailoredSolutions = () => {
 };
 
 // Pricing Tier component
-const PricingTier = ({
-  title,
-  range,
-  highlight,
-  successFee,
-  description,
-}: {
+const PricingTier: React.FC<{
   title: string;
   range: string;
   highlight: boolean;
   successFee: string;
   description: string;
-}) => {
+}> = ({ title, range, highlight, successFee, description }) => {
+  const prefersReduced = useReducedMotion();
   return (
     <motion.div
-      className={`rounded-lg overflow-hidden ${
-        highlight ? "glass-card border border-ph/20 shadow-md shadow-ph/5" : "bg-white/80 border border-white/20"
-      }`}
-      whileHover={{ y: -3 }}
+      className={`rounded-lg overflow-hidden ${highlight ? 'glass-card border border-ph/20 shadow-md shadow-ph/5' : 'bg-white/80 border border-white/20'}`}
+      whileHover={prefersReduced ? {} : { y: -3 }}
       transition={{ duration: 0.25, ease: EASE }}
-      initial={{ opacity: 0, y: 12 }}
+      initial={prefersReduced ? false : { opacity: 0, y: 12 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.35 }}
     >
-      <div className={`p-5 ${highlight ? "bg-gradient-to-br from-ph/5 to-transparent" : "bg-white/50"}`}>
+      <div className={`p-5 ${highlight ? 'bg-gradient-to-br from-ph/5 to-transparent' : 'bg-white/50'}`}>
         <div className="flex justify-between items-start mb-3">
           <h4 className="text-base font-medium text-foreground">{title}</h4>
           {highlight && <span className="px-2 py-0.5 bg-ph/10 text-ph text-xs font-medium rounded-full">Most Popular</span>}
@@ -462,9 +361,9 @@ const PricingTier = ({
         <p className="text-xs text-muted-foreground mb-3">Roles paying {range}</p>
 
         {/* Success fee display */}
-        <div className={`mb-2 p-2 rounded-lg ${highlight ? "bg-ph/10" : "bg-gray-50"}`}>
+        <div className={`mb-2 p-2 rounded-lg ${highlight ? 'bg-ph/10' : 'bg-gray-50'}`}>
           <p className="text-xs uppercase tracking-wide text-muted-foreground font-medium">Success Fee</p>
-          <div className={`text-2xl font-light ${highlight ? "text-ph" : "text-foreground"}`}>
+          <div className={`text-2xl font-light ${highlight ? 'text-ph' : 'text-foreground'}`}>
             {successFee}
             <span className="text-xs font-normal text-muted-foreground ml-1">per hire</span>
           </div>
@@ -473,9 +372,9 @@ const PricingTier = ({
         <div className="mt-3 text-xs text-muted-foreground">{description}</div>
       </div>
 
-      <div className={`px-5 py-3 border-t ${highlight ? "border-ph/10 bg-white/50" : "border-gray-100 bg-white/50"}`}>
+      <div className={`px-5 py-3 border-t ${highlight ? 'border-ph/10 bg-white/50' : 'border-gray-100 bg-white/50'}`}>
         <div className="flex items-center">
-          <Check className={`w-3 h-3 mr-2 ${highlight ? "text-ph" : "text-gray-400"}`} />
+          <Check className={`w-3 h-3 mr-2 ${highlight ? 'text-ph' : 'text-gray-400'}`} />
           <span className="text-xs text-muted-foreground">Access to all product features</span>
         </div>
       </div>

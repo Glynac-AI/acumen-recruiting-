@@ -1,5 +1,6 @@
-// src/components/services/ServicesHero.tsx
-import React, { useEffect, useRef, useState, memo } from "react";
+'use client'
+
+import React, { useEffect, useRef, useState, memo } from 'react';
 import {
   motion,
   useScroll,
@@ -8,11 +9,15 @@ import {
   AnimatePresence,
   useReducedMotion,
   type Variants,
-} from "framer-motion";
+} from 'framer-motion';
 
 const ServicesHero: React.FC = () => {
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const containerRef = useRef<HTMLElement | null>(null);
   const prefersReduced = useReducedMotion();
+
+  // Hydration guard to prevent SSR → CSR flicker
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   // Cursor follower (pointer-fine only)
   const [cursorHovering, setCursorHovering] = useState(false);
@@ -20,38 +25,35 @@ const ServicesHero: React.FC = () => {
   const [pointerFine, setPointerFine] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      setPointerFine(window.matchMedia?.("(pointer: fine)")?.matches ?? false);
+    if (typeof window !== 'undefined') {
+      setPointerFine(window.matchMedia?.('(pointer: fine)')?.matches ?? false);
     }
   }, []);
   useEffect(() => {
     if (!pointerFine) return;
     const onMove = (e: MouseEvent) => setMousePosition({ x: e.clientX, y: e.clientY });
-    window.addEventListener("mousemove", onMove);
-    return () => window.removeEventListener("mousemove", onMove);
+    window.addEventListener('mousemove', onMove, { passive: true });
+    return () => window.removeEventListener('mousemove', onMove);
   }, [pointerFine]);
 
   const cursorX = useSpring(mousePosition.x, { damping: 28, stiffness: 240, mass: 0.5 });
   const cursorY = useSpring(mousePosition.y, { damping: 28, stiffness: 240, mass: 0.5 });
 
   // Parallax (subtle)
-  const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start start", "end start"] });
+  const { scrollYProgress } = useScroll({ target: containerRef, offset: ['start start', 'end start'] });
   const backgroundY = useTransform(scrollYProgress, [0, 1], [0, 40]);
   const backgroundScale = useTransform(scrollYProgress, [0, 1], [1, 1.05]);
   const contentY = useTransform(scrollYProgress, [0, 0.55], [0, 16]);
   const contentOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0.1]);
 
-  // Use tuple easing for FM v11 types
   const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
-
-  // Variants configured for NO re-mount flicker: initial={false} wherever used
   const fadeUp: Variants = {
     hidden: { opacity: 0, y: 14 },
     show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: EASE_OUT } },
   };
 
-  // One spring object for coherent feel
-  const spring = { type: "spring", stiffness: 260, damping: 30, mass: 0.6 } as const;
+  const spring = { type: 'spring', stiffness: 260, damping: 30, mass: 0.6 } as const;
+  const safeTransforms = mounted && !prefersReduced;
 
   return (
     <section
@@ -69,9 +71,9 @@ const ServicesHero: React.FC = () => {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.92 }}
             transition={{ duration: 0.18 }}
-            style={{ x: cursorX, y: cursorY, translateX: "-50%", translateY: "-50%" }}
+            style={{ x: cursorX, y: cursorY, translateX: '-50%', translateY: '-50%' }}
           >
-            <div className="w-4 h-4 rounded-full bg-white/90 backdrop-invert" />
+            <div className="w-3.5 h-3.5 rounded-full bg-white/90 backdrop-invert" />
           </motion.div>
         )}
       </AnimatePresence>
@@ -81,9 +83,10 @@ const ServicesHero: React.FC = () => {
         <motion.div
           className="absolute inset-0 transform-gpu"
           style={{
-            y: prefersReduced ? 0 : backgroundY,
-            scale: prefersReduced ? 1 : backgroundScale,
-            background: "linear-gradient(180deg, #FFFFFF 0%, #F8FAFF 45%, #F4F7FF 100%)",
+            y: safeTransforms ? backgroundY : 0,
+            scale: safeTransforms ? backgroundScale : 1,
+            background: 'linear-gradient(180deg, #FFFFFF 0%, #F8FAFF 45%, #F4F7FF 100%)',
+            backfaceVisibility: 'hidden',
           }}
           initial={false}
           transition={spring}
@@ -92,12 +95,12 @@ const ServicesHero: React.FC = () => {
           className="absolute inset-0"
           style={{
             backgroundImage:
-              "radial-gradient(540px 360px at 86% 20%, rgba(79,107,255,0.10) 0%, rgba(79,107,255,0) 62%)," +
-              "radial-gradient(460px 320px at 18% 72%, rgba(109,134,255,0.08) 0%, rgba(109,134,255,0) 60%)",
+              "radial-gradient(540px 360px at 86% 20%, rgba(79,107,255,0.08) 0%, rgba(79,107,255,0) 62%)," +
+              "radial-gradient(460px 320px at 18% 72%, rgba(109,134,255,0.06) 0%, rgba(109,134,255,0) 60%)",
           }}
         />
         <div
-          className="absolute inset-0 opacity-[0.035]"
+          className="absolute inset-0 opacity-[0.03]"
           style={{
             backgroundImage:
               "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
@@ -105,38 +108,57 @@ const ServicesHero: React.FC = () => {
         />
       </div>
 
-      {/* Floating shapes (looping, no re-mounts) */}
+      {/* Floating shapes (toned borders + amplitudes, non-scaling stroke) */}
       <div className="absolute inset-0 pointer-events-none z-[1]" aria-hidden>
         <motion.svg
-          className="absolute top-[14%] right-[10%] w-60 h-60"
+          className="absolute top-[14%] right-[10%] w-56 h-56 md:w-60 md:h-60 transform-gpu will-change-transform"
           viewBox="0 0 240 240"
           fill="none"
-          animate={prefersReduced ? undefined : { y: [0, -14, 0], rotate: [0, 6, 0], scale: [1, 1.03, 1] }}
-          transition={{ duration: 15, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
-          style={{ filter: "drop-shadow(0 6px 28px rgba(79,107,255,0.18))" }}
+          animate={prefersReduced ? undefined : { y: [0, -8, 0], rotate: [0, 4, 0], scale: [1, 1.01, 1] }}
+          transition={{ duration: 16, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut' }}
+          style={{ filter: 'drop-shadow(0 4px 18px rgba(79,107,255,0.12))', backfaceVisibility: 'hidden' }}
+          initial={false}
         >
-          <circle cx="120" cy="120" r="104" stroke="rgba(79,107,255,0.22)" strokeWidth="2.5" />
-          <circle cx="120" cy="120" r="104" fill="url(#circleGlass)" />
+          <circle
+            cx="120"
+            cy="120"
+            r="104"
+            stroke="rgba(79,107,255,0.14)"
+            strokeWidth="1"
+            vectorEffect="non-scaling-stroke"
+          />
+          <circle cx="120" cy="120" r="104" fill="url(#circleGlass)" opacity="0.7" />
           <defs>
             <linearGradient id="circleGlass" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="rgba(255,255,255,0.06)" />
+              <stop offset="0%" stopColor="rgba(255,255,255,0.05)" />
               <stop offset="100%" stopColor="rgba(255,255,255,0.02)" />
             </linearGradient>
           </defs>
         </motion.svg>
 
         <motion.svg
-          className="absolute bottom-[22%] left-[14%] w-56 h-56"
+          className="absolute bottom-[22%] left-[14%] w-52 h-52 md:w-56 md:h-56 transform-gpu will-change-transform"
           viewBox="0 0 220 220"
           fill="none"
-          animate={prefersReduced ? undefined : { y: [0, 10, 0], rotate: [0, -4, 0], scale: [1, 1.02, 1] }}
-          transition={{ duration: 12, repeat: Infinity, repeatType: "reverse", ease: "easeInOut", delay: 0.8 }}
-          style={{ filter: "drop-shadow(0 6px 24px rgba(79,107,255,0.16))" }}
+          animate={prefersReduced ? undefined : { y: [0, 6, 0], rotate: [0, -3, 0], scale: [1, 1.01, 1] }}
+          transition={{ duration: 14, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut', delay: 0.8 }}
+          style={{ filter: 'drop-shadow(0 4px 16px rgba(79,107,255,0.10))', backfaceVisibility: 'hidden' }}
+          initial={false}
         >
-          <rect x="10" y="10" width="200" height="200" rx="24" stroke="rgba(79,107,255,0.18)" strokeWidth="2.5" fill="url(#rectGlass)" />
+          <rect
+            x="10"
+            y="10"
+            width="200"
+            height="200"
+            rx="24"
+            stroke="rgba(79,107,255,0.14)"
+            strokeWidth="1"
+            vectorEffect="non-scaling-stroke"
+            fill="url(#rectGlass)"
+          />
           <defs>
             <linearGradient id="rectGlass" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="rgba(255,255,255,0.05)" />
+              <stop offset="0%" stopColor="rgba(255,255,255,0.04)" />
               <stop offset="100%" stopColor="rgba(255,255,255,0.02)" />
             </linearGradient>
           </defs>
@@ -147,7 +169,7 @@ const ServicesHero: React.FC = () => {
       <div className="relative grid place-items-center min-h-[60vh] z-10">
         <motion.div
           className="container mx-auto px-6 text-center will-change-transform"
-          style={{ y: prefersReduced ? 0 : contentY, opacity: contentOpacity }}
+          style={{ y: safeTransforms ? contentY : 0, opacity: mounted ? contentOpacity : 1 }}
           initial={false}
           transition={spring}
         >
@@ -162,7 +184,7 @@ const ServicesHero: React.FC = () => {
               <span className="font-light block">Sophisticated recruiting</span>
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#4F6BFF] via-[#6D86FF] to-[#4F6BFF]/80 font-semibold inline-block">
                 services
-              </span>{" "}
+              </span>{' '}
               <span className="font-light">for wealth management</span>
             </h1>
 
@@ -187,7 +209,7 @@ const ServicesHero: React.FC = () => {
               href="/services#services"
               className="group relative overflow-hidden rounded-full bg-[#4F6BFF] px-8 py-4 text-white shadow-lg transition-transform will-change-transform
                          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#4F6BFF]"
-              whileHover={{ y: -3 }}
+              whileHover={prefersReduced ? {} : { y: -3 }}
               transition={{ duration: 0.2 }}
             >
               <span className="relative z-10 text-base font-medium tracking-wide">Explore services</span>
@@ -199,7 +221,7 @@ const ServicesHero: React.FC = () => {
               className="group relative rounded-full border border-[#E5E7EB] px-8 py-4 text-[#0A2540]
                          hover:border-[#4F6BFF]/30 hover:bg-white transition-colors
                          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#4F6BFF]/40"
-              whileHover={{ y: -3 }}
+              whileHover={prefersReduced ? {} : { y: -3 }}
               transition={{ duration: 0.2 }}
             >
               <span className="text-base font-medium tracking-wide">Get started</span>
