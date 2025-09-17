@@ -89,7 +89,6 @@ const PricingHero: React.FC = () => {
         <motion.div
           className="absolute inset-0 transform-gpu"
           style={{
-            // Gate animated values until mounted to avoid SSR/client mismatch
             y: mounted && !prefersReduced ? backgroundY : 0,
             scale: mounted && !prefersReduced ? backgroundScale : 1,
             background:
@@ -170,7 +169,6 @@ const PricingHero: React.FC = () => {
       <div className="relative grid place-items-center min-h-[60vh] z-10">
         <motion.div
           className="container mx-auto px-6 text-center"
-          // Gate transform/opacity until mounted
           style={{
             y: mounted && !prefersReduced ? contentY : 0,
             opacity: mounted ? contentOpacity : 1,
@@ -179,17 +177,37 @@ const PricingHero: React.FC = () => {
           <motion.div
             className="max-w-4xl mx-auto"
             variants={fadeUp}
-            // Disable SSR "hidden" to prevent mismatch, enable after mount
             initial={mounted ? "hidden" : false}
             animate={mounted ? "show" : undefined}
             viewport={{ once: true, amount: 0.6 }}
           >
             <h1 className="text-[clamp(2.6rem,6.2vw,4.9rem)] leading-[1.08] font-display tracking-[-0.025em] text-[#0A2540]">
               <span className="font-light block">Transparent,</span>
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#4F6BFF] via-[#6D86FF] to-[#4F6BFF]/80 font-semibold inline-block">
+
+              {/* ✨ Simple shimmer animation on the keyword */}
+              <motion.span
+                className="bg-clip-text text-transparent font-semibold inline-block"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(90deg, #4F6BFF 0%, #6D86FF 50%, rgba(79,107,255,0.8) 100%)",
+                  backgroundSize: "200% 100%",
+                  backgroundPosition: "0% 50%",
+                }}
+                animate={
+                  prefersReduced
+                    ? undefined
+                    : { backgroundPosition: ["0% 50%", "100% 50%"] }
+                }
+                transition={
+                  prefersReduced
+                    ? undefined
+                    : { duration: 8, repeat: Infinity, ease: "linear" }
+                }
+              >
                 value-based pricing
-              </span>
+              </motion.span>
             </h1>
+
             <motion.p
               className="mt-6 text-lg md:text-xl text-[#505c6e] max-w-2xl mx-auto leading-relaxed"
               variants={fadeUp}
