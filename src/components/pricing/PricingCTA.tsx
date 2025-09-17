@@ -1,12 +1,13 @@
+// src/components/pricing/PricingCTA.tsx
 import React from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Shield, Database, CheckCircle, Clock } from "lucide-react";
+import { ArrowRight, Shield, Clock, CheckCircle, DollarSign } from "lucide-react";
 
 const PricingCTA = () => {
     return (
         <section className="py-28 relative overflow-hidden">
             {/* Rich gradient background */}
-            <div className="absolute inset-0 bg-gradient-to-r from-ph/95 to-[#3A56E8] pointer-events-none"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-[#4F6BFF]/95 to-[#3A56E8] pointer-events-none"></div>
 
             {/* Abstract background elements */}
             <div className="absolute inset-0 pointer-events-none">
@@ -44,88 +45,64 @@ const PricingCTA = () => {
                             viewport={{ once: true }}
                             transition={{ duration: 0.7, delay: 0.2 }}
                         >
-                            Partner with Acumen Recruiting to find exceptional wealth management talent at a fraction of traditional recruiting costs.
+                            Partner with Acumen Recruiting to find exceptional wealth management talent
+                            at a fraction of traditional recruiting costs
                         </motion.p>
                     </motion.div>
 
-                    {/* Benefits and stats grid */}
-                    <motion.div
-                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16"
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.3, duration: 0.7 }}
-                    >
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
                         {[
                             {
-                                icon: <Shield className="w-6 h-6" />,
-                                title: "Specialized Focus",
-                                description: "100% dedicated to wealth management recruiting"
-                            },
-                            {
-                                icon: <Database className="w-6 h-6" />,
-                                title: "Talent Database",
-                                description: "2,000+ pre-screened candidates ready for review"
-                            },
-                            {
-                                icon: <CheckCircle className="w-6 h-6" />,
-                                title: "Success Rate",
-                                description: "93% of searches successfully filled"
-                            },
-                            {
                                 icon: <Clock className="w-6 h-6" />,
-                                title: "Time Savings",
-                                description: "7-14 days average time-to-hire"
+                                title: "70% Faster Hiring",
+                                description: "Average time-to-hire of just 7-14 days compared to the industry standard of 45-60 days."
+                            },
+                            {
+                                icon: <DollarSign className="w-6 h-6" />,
+                                title: "60-80% Cost Savings",
+                                description: "Save tens of thousands in recruiting fees compared to traditional agencies."
+                            },
+                            {
+                                icon: <Shield className="w-6 h-6" />,
+                                title: "6-Month Guarantee",
+                                description: "Peace of mind with our comprehensive 6-month replacement guarantee."
                             }
-                        ].map((stat, index) => (
+                        ].map((benefit, index) => (
                             <motion.div
                                 key={index}
-                                className="bg-white/15 backdrop-blur-sm rounded-lg p-6 border border-white/15 shadow-lg shadow-black/10"
-                                initial={{ opacity: 0, y: 15 }}
+                                className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/15"
+                                initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                transition={{ delay: 0.4 + index * 0.1, duration: 0.5 }}
-                                whileHover={{
-                                    y: -5,
-                                    backgroundColor: "rgba(255, 255, 255, 0.2)",
-                                }}
+                                transition={{ duration: 0.5, delay: 0.3 + (index * 0.1) }}
+                                whileHover={{ y: -5, transition: { duration: 0.2 } }}
                             >
-                                <div className="bg-white/15 p-3 rounded-lg text-white mb-4 w-12 h-12 flex items-center justify-center">
-                                    {stat.icon}
+                                <div className="bg-white/15 p-3 rounded-lg text-white inline-block mb-4">
+                                    {benefit.icon}
                                 </div>
-                                <h3 className="text-white font-medium mb-2">{stat.title}</h3>
-                                <p className="text-white/80 text-sm">{stat.description}</p>
+                                <h3 className="text-white text-xl font-medium mb-2">{benefit.title}</h3>
+                                <p className="text-white/80">{benefit.description}</p>
                             </motion.div>
                         ))}
-                    </motion.div>
+                    </div>
 
-                    {/* CTA buttons */}
                     <motion.div
-                        className="flex flex-col sm:flex-row gap-6 justify-center"
+                        className="text-center"
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        transition={{ delay: 0.5, duration: 0.7 }}
+                        transition={{ duration: 0.5, delay: 0.6 }}
                     >
-                        <motion.a
+                        <a
                             href="/contact"
-                            className="px-8 py-4 bg-white text-ph font-medium rounded-lg shadow-lg shadow-black/10 flex items-center justify-center gap-2"
-                            whileHover={{ y: -3, boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.2)" }}
-                            whileTap={{ scale: 0.98 }}
+                            className="inline-flex items-center bg-white text-[#4F6BFF] py-4 px-8 rounded-full font-medium shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 text-lg"
                         >
-                            Schedule a Consultation
-                            <ArrowRight className="w-4 h-4" />
-                        </motion.a>
-
-                        <motion.a
-                            href="/services"
-                            className="px-8 py-4 bg-transparent border border-white/20 text-white font-medium rounded-lg flex items-center justify-center gap-2 hover:bg-white/10 transition-colors"
-                            whileHover={{ y: -3 }}
-                            whileTap={{ scale: 0.98 }}
-                        >
-                            Explore Our Services
-                            <ArrowRight className="w-4 h-4" />
-                        </motion.a>
+                            Get Started
+                            <ArrowRight className="ml-2 w-5 h-5" />
+                        </a>
+                        <p className="mt-4 text-white/80">
+                            No long-term contracts. Cancel anytime.
+                        </p>
                     </motion.div>
                 </div>
             </div>
