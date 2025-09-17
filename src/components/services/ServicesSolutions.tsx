@@ -1,33 +1,12 @@
 // src/components/services/ServicesSolutions.tsx
-import React, { useRef, useState, memo } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
-import {
-  Play,
-  Users,
-  Layers,
-  ArrowRight,
-  Check,
-  PhoneCall,
-  Palette,
-  Search,
-  ListChecks,
-  Handshake,
-  ChevronRight,
-} from "lucide-react";
-
-/**
- * Notes on smoothness (no blinking):
- * - Removed AnimatePresence for the tab body swap to avoid mount/unmount flashes.
- * - Use `initial={false}` everywhere swapping keyed content so nothing re-animates from 0 → 1 on each tab change.
- * - Preserve container height with a minHeight so layout doesn’t jump when content length differs.
- * - Use spring transitions and `layout` where helpful for buttery moves without opacity flicker.
- * - Respect `prefers-reduced-motion` via CSS (tailwind) and by limiting intensive animations.
- */
+import React, { useRef, useState } from "react";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { Play, Users, Layers, ArrowRight, Check, PhoneCall, Palette, Search, ListChecks, Handshake, ChevronRight } from "lucide-react";
 
 const ServicesSolutions = () => {
   const [activeService, setActiveService] = useState("snapshot");
   const [activeStep, setActiveStep] = useState("consultation");
-  const sectionRef = useRef<HTMLDivElement | null>(null);
+  const sectionRef = useRef(null);
 
   // Scroll-based animations for header
   const { scrollYProgress } = useScroll({
@@ -36,8 +15,8 @@ const ServicesSolutions = () => {
   });
 
   const titleOpacity = useTransform(scrollYProgress, [0.05, 0.15], [0, 1]);
-  const titleY = useTransform(scrollYProgress, [0.05, 0.15], [16, 0]);
-  const backgroundY = useTransform(scrollYProgress, [0, 1], [0, 40]);
+  const titleY = useTransform(scrollYProgress, [0.05, 0.15], [30, 0]);
+  const backgroundY = useTransform(scrollYProgress, [0, 1], [0, 50]);
 
   // Services data (tabs)
   const services = [
@@ -116,9 +95,9 @@ const ServicesSolutions = () => {
         { level: "120k-300k roles", price: "Pricing triples" },
       ],
     },
-  ] as const;
+  ];
 
-  const activeServiceData = services.find((s) => s.id === activeService) ?? services[0];
+  const activeServiceData = services.find((s) => s.id === activeService) || services[0];
 
   // --- ACUMEN EXPERIENCE (redesigned) ---
   const steps = [
@@ -187,9 +166,7 @@ const ServicesSolutions = () => {
       ],
       icon: <Handshake className="w-5 h-5" />,
     },
-  ] as const;
-
-  const spring = { type: "spring", stiffness: 260, damping: 28, mass: 0.6 } as const;
+  ];
 
   return (
     <section ref={sectionRef} className="py-36 relative overflow-hidden bg-white" id="services">
@@ -197,50 +174,44 @@ const ServicesSolutions = () => {
       <motion.div
         className="absolute inset-0 bg-gradient-to-b from-white to-gray-50/30 pointer-events-none"
         style={{ y: backgroundY }}
-        aria-hidden
       />
-      <div
-        className="absolute inset-0 opacity-[0.02]"
-        aria-hidden
-        style={{
-          backgroundImage:
-            "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E\")",
-          backgroundSize: "200px",
-        }}
-      />
+      <div className="absolute inset-0 opacity-[0.02]" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+        backgroundSize: "200px",
+      }} />
 
       <div className="container mx-auto px-6 relative z-10">
         {/* Solutions header */}
         <motion.div
-          className="max-w-3xl mx-auto text-center mb-24 motion-safe:transition"
+          className="max-w-3xl mx-auto text-center mb-24"
           style={{ opacity: titleOpacity, y: titleY }}
         >
           <motion.span
             className="inline-block py-1.5 px-4 bg-ph/10 text-ph font-medium rounded-full text-sm mb-6"
-            initial={false}
+            initial={{ opacity: 0, y: -10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={spring}
+            transition={{ duration: 0.5 }}
           >
             Our Solutions
           </motion.span>
 
           <motion.h2
             className="text-4xl md:text-5xl font-display font-light tracking-tight text-foreground mb-6"
-            initial={false}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={spring}
+            transition={{ duration: 0.7 }}
           >
             Tailored Recruiting Solutions
           </motion.h2>
 
           <motion.p
             className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed"
-            initial={false}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={spring}
+            transition={{ duration: 0.7, delay: 0.1 }}
           >
             Discover our thoughtfully designed approaches to talent identification, each crafted to address specific recruiting needs.
           </motion.p>
@@ -249,174 +220,170 @@ const ServicesSolutions = () => {
         {/* Services Tabs */}
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row gap-4 mb-16">
-            {services.map((service) => {
-              const isActive = activeService === service.id;
-              return (
-                <motion.button
-                  key={service.id}
-                  id={`${service.id}`}
-                  type="button"
-                  className={`flex-1 relative py-6 px-6 rounded-xl transition-all duration-300 overflow-hidden ${
-                    isActive
-                      ? "bg-white shadow-md border border-ph/10"
-                      : "bg-white/50 hover:bg-white hover:shadow-sm"
-                  }`}
-                  onClick={() => setActiveService(service.id)}
-                  whileHover={{ y: -2 }}
-                  whileTap={{ scale: 0.995 }}
-                  transition={spring}
-                >
-                  {isActive && (
-                    <motion.div
-                      className="absolute inset-0 bg-gradient-to-br from-ph/5 to-transparent -z-10"
-                      layoutId="serviceTabHighlight"
-                      transition={spring}
-                    />
-                  )}
+            {services.map((service) => (
+              <motion.button
+                key={service.id}
+                id={`${service.id}`}
+                className={`flex-1 relative py-6 px-6 rounded-xl transition-all duration-300 overflow-hidden ${
+                  activeService === service.id
+                    ? "bg-white shadow-md border border-ph/10"
+                    : "bg-white/50 hover:bg-white hover:shadow-sm"
+                }`}
+                onClick={() => setActiveService(service.id)}
+                whileHover={{ y: -3 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                {activeService === service.id && (
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-br from-ph/5 to-transparent -z-10"
+                    layoutId="serviceTabHighlight"
+                    transition={{ duration: 0.3 }}
+                  />
+                )}
 
-                  <div className="flex items-center gap-4">
-                    <div
-                      className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                        isActive ? "bg-ph/10 text-ph" : "bg-gray-100 text-gray-400"
+                <div className="flex items-center gap-4">
+                  <div
+                    className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                      activeService === service.id ? "bg-ph/10 text-ph" : "bg-gray-100 text-gray-400"
+                    }`}
+                  >
+                    {service.icon}
+                  </div>
+                  <div className="text-left">
+                    <h3
+                      className={`font-medium text-lg ${
+                        activeService === service.id ? "text-ph" : "text-foreground"
                       }`}
                     >
-                      {service.icon}
-                    </div>
-                    <div className="text-left">
-                      <h3
-                        className={`font-medium text-lg ${
-                          isActive ? "text-ph" : "text-foreground"
-                        }`}
-                      >
-                        {service.title}
-                      </h3>
-                      <p className="text-muted-foreground text-sm line-clamp-1">{service.description}</p>
-                    </div>
-                  </div>
-                </motion.button>
-              );
-            })}
-          </div>
-
-          {/* Service Details (no blinking) */}
-          <motion.div
-            key={activeService}
-            layout
-            initial={false}
-            animate={{ opacity: 1, y: 0 }}
-            transition={spring}
-          >
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="p-10">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                  {/* Left */}
-                  <div>
-                    <motion.div
-                      className="flex items-center gap-3 mb-6"
-                      initial={false}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={spring}
-                    >
-                      <div className="p-2 rounded-lg bg-ph/10 text-ph">{activeServiceData.icon}</div>
-                      <h3 className="text-2xl font-display font-light text-foreground">
-                        {activeServiceData.title}
-                      </h3>
-                    </motion.div>
-
-                    <motion.p
-                      className="text-muted-foreground mb-8"
-                      initial={false}
-                      animate={{ opacity: 1 }}
-                      transition={spring}
-                    >
-                      {activeServiceData.description}
-                    </motion.p>
-
-                    <motion.div initial={false} animate={{ opacity: 1 }} transition={spring}>
-                      <h4 className="font-medium text-foreground mb-4">Key Features</h4>
-                      <ul className="space-y-3 mb-8">
-                        {activeServiceData.details.map((detail, index) => (
-                          <motion.li
-                            key={index}
-                            className="flex items-start gap-3"
-                            initial={false}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ ...spring, delay: 0.02 * index }}
-                          >
-                            <Check className="w-5 h-5 text-ph mt-0.5 shrink-0" />
-                            <span className="text-muted-foreground">{detail}</span>
-                          </motion.li>
-                        ))}
-                      </ul>
-                    </motion.div>
-                  </div>
-
-                  {/* Right */}
-                  <div>
-                    <motion.div initial={false} animate={{ opacity: 1 }} transition={spring}>
-                      <h4 className="font-medium text-foreground mb-4">Benefits</h4>
-                      <ul className="space-y-3 mb-8">
-                        {activeServiceData.benefits.map((benefit, index) => (
-                          <motion.li
-                            key={index}
-                            className="flex items-start gap-3"
-                            initial={false}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ ...spring, delay: 0.02 * index }}
-                          >
-                            <Check className="w-5 h-5 text-ph mt-0.5 shrink-0" />
-                            <span className="text-muted-foreground">{benefit}</span>
-                          </motion.li>
-                        ))}
-                      </ul>
-                    </motion.div>
-
-                    <motion.div
-                      initial={false}
-                      animate={{ opacity: 1 }}
-                      transition={spring}
-                      className="bg-gray-50 p-6 rounded-xl"
-                    >
-                      <h4 className="font-medium text-foreground mb-4">Pricing</h4>
-                      <div className="space-y-4">
-                        {activeServiceData.pricing.map((tier, index) => (
-                          <div key={index} className="pb-4 border-b border-gray-100 last:border-0 last:pb-0">
-                            <div className="font-medium text-sm mb-1">{tier.level}</div>
-                            <div className="text-muted-foreground">{tier.price}</div>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="mt-6 pt-4 border-t border-gray-200">
-                        <div className="text-sm text-muted-foreground flex items-start gap-2">
-                          <span className="text-ph mt-0.5">
-                            <Check className="w-4 h-4" />
-                          </span>
-                          Success fee applies per hire
-                        </div>
-                      </div>
-                    </motion.div>
+                      {service.title}
+                    </h3>
+                    <p className="text-muted-foreground text-sm line-clamp-1">{service.description}</p>
                   </div>
                 </div>
-              </div>
+              </motion.button>
+            ))}
+          </div>
 
-              {/* CTA footer */}
-              <div className="bg-gray-50 p-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <p className="text-muted-foreground text-sm">
-                  Ready to transform your talent acquisition with {activeServiceData.title}?
-                </p>
-                <motion.a
-                  href="/contact"
-                  className="inline-flex items-center gap-2 px-5 py-2 bg-ph text-white text-sm font-medium rounded-md transition-colors hover:bg-ph-dark"
-                  whileHover={{ x: 3 }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={spring}
-                >
-                  Get Started
-                  <ArrowRight className="w-4 h-4" />
-                </motion.a>
+          {/* Service Details */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeService}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+            >
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="p-10">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                    {/* Left */}
+                    <div>
+                      <motion.div
+                        className="flex items-center gap-3 mb-6"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5 }}
+                      >
+                        <div className="p-2 rounded-lg bg-ph/10 text-ph">{activeServiceData.icon}</div>
+                        <h3 className="text-2xl font-display font-light text-foreground">
+                          {activeServiceData.title}
+                        </h3>
+                      </motion.div>
+
+                      <motion.p
+                        className="text-muted-foreground mb-8"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.5, delay: 0.1 }}
+                      >
+                        {activeServiceData.description}
+                      </motion.p>
+
+                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.2 }}>
+                        <h4 className="font-medium text-foreground mb-4">Key Features</h4>
+                        <ul className="space-y-3 mb-8">
+                          {activeServiceData.details.map((detail, index) => (
+                            <motion.li
+                              key={index}
+                              className="flex items-start gap-3"
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: 0.3 + index * 0.1 }}
+                            >
+                              <Check className="w-5 h-5 text-ph mt-0.5 shrink-0" />
+                              <span className="text-muted-foreground">{detail}</span>
+                            </motion.li>
+                          ))}
+                        </ul>
+                      </motion.div>
+                    </div>
+
+                    {/* Right */}
+                    <div>
+                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.3 }}>
+                        <h4 className="font-medium text-foreground mb-4">Benefits</h4>
+                        <ul className="space-y-3 mb-8">
+                          {activeServiceData.benefits.map((benefit, index) => (
+                            <motion.li
+                              key={index}
+                              className="flex items-start gap-3"
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: 0.4 + index * 0.1 }}
+                            >
+                              <Check className="w-5 h-5 text-ph mt-0.5 shrink-0" />
+                              <span className="text-muted-foreground">{benefit}</span>
+                            </motion.li>
+                          ))}
+                        </ul>
+                      </motion.div>
+
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.5, delay: 0.5 }}
+                        className="bg-gray-50 p-6 rounded-xl"
+                      >
+                        <h4 className="font-medium text-foreground mb-4">Pricing</h4>
+                        <div className="space-y-4">
+                          {activeServiceData.pricing.map((tier, index) => (
+                            <div key={index} className="pb-4 border-b border-gray-100 last:border-0 last:pb-0">
+                              <div className="font-medium text-sm mb-1">{tier.level}</div>
+                              <div className="text-muted-foreground">{tier.price}</div>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="mt-6 pt-4 border-t border-gray-200">
+                          <div className="text-sm text-muted-foreground flex items-start gap-2">
+                            <span className="text-ph mt-0.5">
+                              <Check className="w-4 h-4" />
+                            </span>
+                            Success fee applies per hire
+                          </div>
+                        </div>
+                      </motion.div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* CTA footer */}
+                <div className="bg-gray-50 p-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+                  <p className="text-muted-foreground text-sm">
+                    Ready to transform your talent acquisition with {activeServiceData.title}?
+                  </p>
+                  <motion.a
+                    href="/contact"
+                    className="inline-flex items-center gap-2 px-5 py-2 bg-ph text-white text-sm font-medium rounded-md transition-colors hover:bg-ph-dark"
+                    whileHover={{ x: 3 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    Get Started
+                    <ArrowRight className="w-4 h-4" />
+                  </motion.a>
+                </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </AnimatePresence>
         </div>
 
         {/* ---------- ACUMEN EXPERIENCE (2026 UX) ---------- */}
@@ -493,10 +460,10 @@ const ServicesSolutions = () => {
                   id={s.id}
                   key={s.id}
                   className="relative rounded-2xl border border-gray-100 bg-white/70 backdrop-blur-sm shadow-sm overflow-hidden scroll-mt-28"
-                  initial={false}
+                  initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-10% 0px -10% 0px" }}
-                  transition={{ ...spring, delay: idx * 0.03 }}
+                  transition={{ duration: 0.5, delay: idx * 0.05 }}
                   onViewportEnter={() => setActiveStep(s.id)}
                 >
                   {/* accent bar */}
@@ -526,13 +493,14 @@ const ServicesSolutions = () => {
 
               {/* Process CTA */}
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 rounded-2xl border border-[#4F6BFF]/20 bg-[#4F6BFF]/5 p-6">
-                <p className="text-sm text-[#505c6e]">Ready to run this process for your next role?</p>
+                <p className="text-sm text-[#505c6e]">
+                  Ready to run this process for your next role?
+                </p>
                 <motion.a
                   href="/contact"
                   className="inline-flex items-center gap-2 px-5 py-2 bg-[#4F6BFF] text-white text-sm font-medium rounded-md hover:bg-[#445fe6]"
                   whileHover={{ x: 3 }}
                   whileTap={{ scale: 0.98 }}
-                  transition={spring}
                 >
                   Start a conversation
                   <ArrowRight className="w-4 h-4" />
@@ -546,4 +514,4 @@ const ServicesSolutions = () => {
   );
 };
 
-export default memo(ServicesSolutions);
+export default ServicesSolutions;
