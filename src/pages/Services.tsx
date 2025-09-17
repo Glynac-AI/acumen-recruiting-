@@ -1,20 +1,15 @@
-import React from "react";
+// src/pages/Services.tsx
+import * as React from "react";
 import ServicesHero from "@/components/services/ServicesHero";
 import ServicesSolutions from "@/components/services/ServicesSolutions";
-import ServicesRoles from "@/components/services/ServicesRoles";
-import ServicesProcess from "@/components/services/ServicesProcess";
-import ServicesCTA from "@/components/services/ServicesCTA";
+import ServicesCTA from "@/components/services/ServicesCTA"; // keep if you use it
 
-const Services = () => {
-    return (
-        <div className="min-h-screen bg-background">
-            <ServicesHero />
-            <ServicesSolutions />
-            <ServicesRoles />
-            <ServicesProcess />
-            <ServicesCTA />
-        </div>
-    );
-};
-
-export default Services;
+export default function Services() {
+  return (
+    <>
+      <ServicesHero />
+      <ServicesSolutions />   {/* includes the new Acumen Experience block */}
+      <ServicesCTA />
+    </>
+  );
+}
